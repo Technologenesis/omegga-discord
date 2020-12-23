@@ -1,0 +1,26 @@
+{
+  "name": "Discord Integration",
+  "description": "This plugin provides a highly configurable interface between a Brickadia server and a discord server.",
+  "author": "technologenesis",
+  "config": {
+    "token": {
+      "description": "This is the message that is broadcast when the plugin is loaded",
+      "type": "string"
+    },
+    "channel-id": {
+      "description": "The ID of the channel to post to",
+      "type": "string"
+    },
+    "mod-id": {
+      "description": "Optional; The ID of the user or role to be tagged in reports",
+      "type": "string"
+    }
+  },
+  "commands": [
+    {
+      "name": "!mod",
+      "description": "submits a report to the moderator",
+      "example": "!mod <player> is griefing"
+    }
+  ]
+}
