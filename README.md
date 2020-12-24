@@ -77,7 +77,7 @@ The following features are planned for this project. Anyone should feel free to 
 
 [x] post reports in chat log if no mod-channel-id present
 
-[ ] link to relevant chat log
+[x] link to relevant chat log
 
 [ ] Enable using a user ID for `mod-channel-id`
 
@@ -92,6 +92,10 @@ The following features are planned for this project. Anyone should feel free to 
 [ ] Allow Discord users to verify their in-game characters
 
 [ ] Allow players to opt in or out of seeing Discord messages in-game, with default provided in config.
+
+[ ] Show in-game players as separate role
+
+[ ] Allow mentioning discord users from in-game chat
 
 ---
 
