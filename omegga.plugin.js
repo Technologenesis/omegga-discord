@@ -30,7 +30,10 @@ class DiscordIntegrationPlugin {
 
         // todo: connect in-game and discord chats
         this.omegga.on("chat", (name, msg) => {
-            this.discordClient.channels.fetch(this.config["chat-channel"]).then(channel)
+            this.discordClient.channels.fetch(this.config["chat-channel-id"]).then(channel => {
+                let embed = new Discord.MessageEmbed().setAuthor(name).setDescription(msg);
+                channel.send(embed);
+            })
         });
 
         // Todo: allow moderators to execute commands from discord
