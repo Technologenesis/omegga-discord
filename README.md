@@ -87,7 +87,7 @@ The following features are planned for this project. Anyone should feel free to 
 
 [x] Maintain chat log in `chat-channel-id`, if present
 
-[ ] If `godspeak` is enabled, relay messages
+[ ] If `godspeak` is enabled, relay discord messages
 
 [ ] Allow Discord users to verify their in-game characters
 
