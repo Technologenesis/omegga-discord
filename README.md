@@ -91,6 +91,8 @@ The following features are planned for this project. Anyone should feel free to 
 
 [ ] Allow Discord users to verify their in-game characters
 
+[ ] Allow players to opt in or out of seeing Discord messages in-game, with default provided in config.
+
 ---
 
 [ ] **Remote moderation**
