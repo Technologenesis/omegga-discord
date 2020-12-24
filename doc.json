@@ -4,15 +4,19 @@
   "author": "technologenesis",
   "config": {
     "token": {
-      "description": "This is the message that is broadcast when the plugin is loaded",
+      "description": "The authorization token for the bot to use",
       "type": "string"
     },
-    "channel-id": {
-      "description": "The ID of the channel to post to",
+    "mod-channel-id": {
+      "description": "The ID of the channel to post mod messages to",
       "type": "string"
     },
-    "mod-id": {
-      "description": "Optional; The ID of the user or role to be tagged in reports",
+    "mod-tag-id": {
+      "description": "The ID of the user or role to be tagged in reports",
+      "type": "string"
+    },
+    "chat-channel-id": {
+      "description": "The ID of the channel to post chat logs to",
       "type": "string"
     }
   },
