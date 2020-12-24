@@ -75,7 +75,7 @@ The following features are planned for this project. Anyone should feel free to 
 
 [x] tag mods in reports
 
-[ ] post reports in chat log if no mod-channel-id present
+[x] post reports in chat log if no mod-channel-id present
 
 [ ] link to relevant chat log
 
@@ -85,7 +85,7 @@ The following features are planned for this project. Anyone should feel free to 
 
 [ ] **Chat mirroring**
 
-[ ] Maintain chat log in `chat-channel-id`, if present
+[x] Maintain chat log in `chat-channel-id`, if present
 
 [ ] If `godspeak` is enabled, relay messages
 
@@ -98,3 +98,5 @@ The following features are planned for this project. Anyone should feel free to 
 [ ] **Remote moderation**
 
 [ ] Allow users with specific role (or with access to `mod-channel-id`?) to execute server commands from discord.
+
+[ ] Role integration; allow modifying in-game roles from Discord, and vice-versa
