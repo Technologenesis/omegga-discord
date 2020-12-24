@@ -1,5 +1,5 @@
 {
-  "name": "Discord Integration",
+  "name": "Omegga-Discord",
   "description": "This plugin provides a highly configurable interface between a Brickadia server and a discord server.",
   "author": "technologenesis",
   "config": {
