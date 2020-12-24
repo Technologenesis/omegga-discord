@@ -18,6 +18,21 @@
     "chat-channel-id": {
       "description": "The ID of the channel to post chat logs to",
       "type": "string"
+    },
+    "enable-godspeak-for-mods": {
+      "description": "Should messages in mod channel be relayed to in-game chat?",
+      "type": "boolean",
+      "default": true
+    },
+    "enable-godspeak-for-users": {
+      "description": "Should messages in chat channel be relayed to in-game chat?",
+      "type": "boolean",
+      "default": false
+    },
+    "enable-remote-commands": {
+      "description": "Allow commands in mod channel? IF THIS IS ENABLED, MAKE SURE YOUR MOD CHANNEL HAS MESSAGES RESTRICTED",
+      "type": "boolean",
+      "default": false
     }
   },
   "commands": [
