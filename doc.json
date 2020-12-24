@@ -11,6 +11,10 @@
       "description": "The ID of the channel to post mod messages to",
       "type": "string"
     },
+    "log-channel-id": {
+      "description": "The ID of the channel to post console logs to, and to read console commands from",
+      "type": "string"
+    },
     "mod-tag-id": {
       "description": "The ID of the user or role to be tagged in reports",
       "type": "string"
@@ -31,6 +35,11 @@
     },
     "enable-remote-commands": {
       "description": "Allow commands in mod channel? IF THIS IS ENABLED, MAKE SURE YOUR MOD CHANNEL HAS MESSAGES RESTRICTED",
+      "type": "boolean",
+      "default": false
+    },
+    "enable-console-logs": {
+      "description": "Should console logs be sent to the log channel?",
       "type": "boolean",
       "default": false
     }

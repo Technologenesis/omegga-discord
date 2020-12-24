@@ -5,18 +5,38 @@ const Discord = require('discord.js')
 //Store and validate configuration for easy access
 class ConfigObject {
     constructor(configMap) {
-        this.mod_channel_id = configMap["mod-channel-id"] || configMap["chat-channel-id"];
-        if(!this.mod_channel_id) {
-            throw "config is missing both mod-channel-id and chat-channel-id; one must be present";
-        }
-        this.chat_channel_id = configMap["chat-channel-id"];
-
-        this.mod_msg_prefix = configMap["mod-tag-id"] ? `<@${configMap["mod-tag-id"]}> ` : ``;
-
         this.token = configMap["token"];
         if(!this.token) {
             throw "missing Discord token!"
         }
+
+        this.mod_channel_id = configMap["mod-channel-id"];
+        this.enable_godspeak_for_mods = configMap["enable-godspeak-for-mods"];
+        if(this.enable_godspeak_for_mods && !this.mod_channel_id) {
+            throw "mod-channel-id is required if enable-godspeak-for-mods is true";
+        }
+
+        this.chat_channel_id = configMap["chat-channel-id"];
+        this.enable_godspeak_for_users = configMap["enable-godspeak-for-users"];
+        if(this.enable_godspeak_for_users && !this.chat_channel_id) {
+            throw "chat-channel-id is required if enable-godspeak-for-users is true";
+        }
+
+        if(!this.mod_channel_id && !this.chat_channel_id) {
+            throw "config is missing both mod-channel-id and chat-channel-id; one must be present";
+        }
+
+        this.log_channel_id = configMap["log-channel-id"];
+        this.enable_console_logs = configMap["enable-console-logs"];
+        this.enable_remote_commands = configMap["enable-remote-commands"];
+        if (this.enable_remote_commands && !this.log_channel_id) {
+            throw "config log-channel-id must be present if enable-remote-commands is true";
+        }
+        if (this.enable_console_logs && !this.log_channel_id) {
+            throw "config log-channel-id must be present if enable-console-logs is true";
+        }
+
+        this.mod_msg_prefix = configMap["mod-tag-id"] ? `<@${configMap["mod-tag-id"]}> ` : ``;
     }
 }
 
@@ -33,7 +53,7 @@ class DiscordIntegrationPlugin {
             let msg = args.join(" ");
 
             let embed = new Discord.MessageEmbed()
-                .setColor("#FF0000")
+                .setColor("#ff0000")
                 .setTitle("Report")
                 .setAuthor(name)
 
@@ -78,14 +98,19 @@ class DiscordIntegrationPlugin {
 
         // Resolve channels to avoid fetching each time
         // todo: Does this need to be done serially?
-        this.mod_channel = await this.discordClient.channels.fetch(this.config.mod_channel_id);
         this.chat_channel = this.config.chat_channel_id ?
             await this.discordClient.channels.fetch(this.config.chat_channel_id) :
+            null;
+        this.mod_channel = this.config.mod_channel_id ?
+            await this.discordClient.channels.fetch(this.config.mod_channel_id) :
+            chat_channel;
+        this.log_channel = this.config.log_channel_id ?
+            await this.discordClient.channels.fetch(this.config.log_channel_id) :
             null;
 
         // todo: bind in-game users to discord users
 
-        // todo: connect in-game and discord chats
+        // chat log + command interpreter
         this.omegga.on("chat", (name, msg) => {
             if(this.chat_channel) {
                 // If there's a chat log, send to the chat log first, THEN check for command command with reference to
@@ -97,6 +122,32 @@ class DiscordIntegrationPlugin {
                 this.InterpretChatCMD(name, msg, null);
             }
         });
+
+        // stream console logs
+        if(this.config.enable_console_logs) {
+            this.omegga.on("line", logline => this.log_channel.send(logline));
+        }
+
+        // deal with discord messages in relevant channels
+        // TODO
+        /*
+        if(this.config.EnableGodspeakForUsers || this.config.EnableGodspeakForMods || this.config.EnableRemoteCommands) {
+            this.discordClient.on("message", msg => {
+                if(msg.channel == this.chat_channel) {
+                    if(this.config.enableGodSpeakForUsers) {
+
+                    }
+                } else if(msg.channel == this.mod_channel) {
+                    if(this.config.EnableRemoteCommands) {
+                        asCmd = msg.match(/!exec (.*)/);
+                        if(asCmd) {
+                            this.omegga.exe
+                        }
+                    }
+                }
+            });
+        }
+        */
 
         // Todo: allow moderators to execute commands from discord
     }
