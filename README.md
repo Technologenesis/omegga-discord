@@ -104,3 +104,11 @@ The following features are planned for this project. Anyone should feel free to 
 [ ] Allow users with specific role (or with access to `mod-channel-id`?) to execute server commands from discord.
 
 [ ] Role integration; allow modifying in-game roles from Discord, and vice-versa
+
+---
+
+[ ] **Make Everything Configurable!!**
+
+[ ] Configurable content of bot messages
+
+*As more features are implemented, keep track of what can be made configurable here*
