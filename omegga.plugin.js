@@ -10,19 +10,17 @@ class ConfigObject {
             throw "missing Discord token!"
         }
 
+        this.guild_id = configMap["guild-id"];
+
         this.mod_channel_id = configMap["mod-channel-id"];
-        this.enable_godspeak_for_mods = configMap["enable-godspeak-for-mods"];
-        if(this.enable_godspeak_for_mods && !this.mod_channel_id) {
-            throw "mod-channel-id is required if enable-godspeak-for-mods is true";
-        }
 
         this.chat_channel_id = configMap["chat-channel-id"];
+        this.enable_godspeak_for_mods = configMap["enable-godspeak-for-mods"];
         this.enable_godspeak_for_users = configMap["enable-godspeak-for-users"];
-        if(this.enable_godspeak_for_users && !this.chat_channel_id) {
+        this.enable_chat_logs = configMap["enable-chat-logs"];
+        if((this.enable_godspeak_for_users || this.enable_godspeak_for_mods || this.enable_chat_logs)
+            && !this.chat_channel_id) {
             throw "chat-channel-id is required if enable-godspeak-for-users is true";
-        }
-        if(this.chat_channel_id == this.mod_channel_id) {
-            throw "chat-channel-id must be different from mod-channel-id";
         }
 
         if(!this.mod_channel_id && !this.chat_channel_id) {
@@ -45,7 +43,8 @@ class ConfigObject {
             throw "log-channel-id must be different from chat-channel-id";
         }
 
-        this.mod_msg_prefix = configMap["mod-tag-id"] ? `<@${configMap["mod-tag-id"]}> ` : ``;
+        this.mod_tag_id = configMap["mod-tag-id"]
+        this.mod_msg_prefix = configMap["mod-tag-id"] ? `<@&${configMap["mod-tag-id"]}> ` : ``;
     }
 }
 
@@ -107,6 +106,8 @@ class DiscordIntegrationPlugin {
 
         // Resolve channels to avoid fetching each time
         // todo: Does this need to be done serially?
+        this.guild = await this.discordClient.guilds.fetch(this.config.guild_id);
+        this.mod_role = await this.guild.roles.fetch(this.config.mod_tag_id);
         this.chat_channel = this.config.chat_channel_id ?
             await this.discordClient.channels.fetch(this.config.chat_channel_id) :
             null;
@@ -117,11 +118,39 @@ class DiscordIntegrationPlugin {
             await this.discordClient.channels.fetch(this.config.log_channel_id) :
             null;
 
+
         // todo: bind in-game users to discord users
 
-        // chat log + command interpreter
+        // commands
+        this.omegga.on("cmd:mod", (name, ...args) => {
+            let msg = args.join(" ");
+
+            let embed = new Discord.MessageEmbed()
+                .setColor("#ff0000")
+                .setTitle("Report")
+                .setAuthor(name);
+
+            if(this.config.enable_chat_logs) {
+                let logref = this.chat_channel.lastMessage.url;
+                embed.setDescription(`A report has been issued: ${msg}\n\n[View chat log at time of report](${logref})`);
+            } else {
+                embed.setDescription(`A report has been issued: ${msg}`);
+            }
+
+            let discordMessage = new Discord.APIMessage(this.mod_channel,
+                {content: this.config.mod_msg_prefix, embed: embed});
+
+            this.mod_channel.send(discordMessage)
+                .then(_ => // todo: differentiate between user and role
+                    this.omegga.whisper(name, `"Your report has been issued to the moderators: \\"${msg}\\""`))
+                .catch(msg =>
+                    this.omegga.whisper(name, `Failed to issue report: ${msg}`)
+                );
+        })
+
+        // chat log
         this.omegga.on("chat", (name, msg) => {
-            if(this.chat_channel) {
+            if(this.config.enable_chat_logs) {
                 // If there's a chat log, send to the chat log first, THEN check for command command with reference to
                 // chat log
                 let embed = new Discord.MessageEmbed().setAuthor(name).setDescription(msg);
@@ -143,18 +172,9 @@ class DiscordIntegrationPlugin {
             || this.config.enable_remote_commands) {
             this.discordClient.on("message", msg => {
 
-                //user godspeak
-                if(msg.channel == this.chat_channel && this.config.enable_godspeak_for_users
-                    && msg.author.id != this.discordClient.user.id) {
-                    this.omegga.broadcast(`<b><color=\"#ffff00\">${
-                        msg.author.username
-                    }</color><color=\"#7289da\"> [discord]</color></b><color=\"ffffff\">: ${
-                        msg.content
-                    }</color>`);
-                }
-
                 //mod godspeak
-                else if(msg.channel == this.mod_channel && this.config.enable_godspeak_for_mods
+                if(msg.channel == this.chat_channel && this.config.enable_godspeak_for_mods
+                    && this.mod_role.members.has(msg.member.id)
                     && msg.author.id != this.discordClient.user.id) {
                     this.omegga.broadcast(`<b><color=\"#ff0000\">${
                         msg.author.username
@@ -163,9 +183,19 @@ class DiscordIntegrationPlugin {
                     }</color>`);
                 }
 
+                //user godspeak
+                else if(msg.channel == this.chat_channel && this.config.enable_godspeak_for_users
+                    && msg.author.id != this.discordClient.user.id) {
+                    this.omegga.broadcast(`<b><color=\"#ffff00\">${
+                        msg.author.username
+                    }</color><color=\"#7289da\"> [discord]</color></b><color=\"ffffff\">: ${
+                        msg.content
+                    }</color>`);
+                }
+
                 // remote commands
                 else if (msg.channel == this.log_channel && this.config.enable_remote_commands
-                    && msg.author.id != this.discordClient.user.id) {
+                    && msg.author.id != this.discordClient.user.id && this.mod_role.members.has(msg.user.id)) {
                     this.omegga.writeln(msg.content);
                 }
 

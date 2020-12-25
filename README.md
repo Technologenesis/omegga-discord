@@ -47,14 +47,16 @@ All configuration is handled through the Omegga web interface.
 | Name  | Description | Default | Required | Permissions |
 |-------|-------------|---------|----------|-------------|
 | token | The authorization token for your bot account | None | **Yes**
-| mod-channel-id | The ID[*](#discordids) of the channel or user for your bot to post mod-only messages to | None; if missing, mod-only messages will be posted to `chat-channel-id` | **Required** if `chat-channel-id` is not supplied, or if `godspeak-enabled-for-mods = true`. | Ensure that your bot is permitted to send messages in the given channel
-| mod-tag-id | The ID[*](#discordids) of the user or role to @mention when posting mod-only messages | None | | If supplied, the bot will need permission to mention the given role or user
-| chat-channel-id | The ID[*](#discordids) of the user or channel in which to log in-game chat | None; if missing, in-game chat will not be logged | **Required** if `mod-channel-id` is not supplied | Ensure that your bot is permitted to send messages in the given channel
+| guild-id | The ID of the discord server | None | Yes | Be sure to invite the bot to your server using the guide linked above|
+| mod-channel-id | The ID[*](#discordids) of the channel or user for your bot to post mod-only messages to | None; if missing, mod-only messages will be posted to `chat-channel-id` | **Required** if `chat-channel-id` is not supplied | Ensure that your bot is permitted to send messages in the given channel
+| mod-tag-id | The ID[*](#discordids) of the role to @mention when posting mod-only messages | None | | If supplied, the bot will need permission to mention the given role or user
+| chat-channel-id | The ID[*](#discordids) of the user or channel in which to log in-game chat | None | **Required** if `mod-channel-id` is not supplied, or if any of `enable-chat-log`, `enable-godspeak-for-users`, or `enable-godspeak-for-mods` is true. | Ensure that your bot is permitted to send messages in the given channel
 | log-channel-id | the ID[*](#discordids) of the user or channel in which to log in-game chat | None | **Required** if either of `enable-console-logs` or `enable-remote-commands` are enabled. **Be sure to restrict access to this channel**
 | enable-console-logs | Send console logs to `log-channel-id`? | false | | Ensure that your bot is permitted to send messages in `log-channel-id`
 | enable-godspeak-for-mods | If enabled, messages posted to `mod-channel-id` from Discord will be relayed to the in-game chat | true | | Ensure that your bot is permitted to read messages in `mod-channel-id`. Be sure only authorized users can post in this channel.
 | enable-godspeak-for-users | If enabled, messages posted to `chat-channel-id` from Discord will be relayed to the in-game chat | false | | Ensure that your bot is permitted to read messages in `chat-channel-id`
 | enable-remote-commands | If enabled, commands can be issued to `log-channel-id` from Discord | false | | Ensure that your bot is permitted to read messages in `log-channel-id`; **BE CERTAIN only those with the desired roles can post to `log-channel-id`** (To-Do: check issued commands against in-game roles)
+| enable-chat-log | Send chat logs to `chat-channel-id`? | false | | Ensure that your bot is permitted to send messages to `chat-channel-id`
 
 <sup><a name="discordids">*</a>: To obtain the ID of a resource in discord, right-click on it in the interface and click "Copy ID". When supplying the ID for a *role* instead of a *user* for the `-tag` options, prepend an ampersand (`&`) at the start of the ID.</sup>
 
