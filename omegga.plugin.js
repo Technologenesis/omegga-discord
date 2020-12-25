@@ -111,7 +111,11 @@ class DiscordIntegrationPlugin {
 
             if(this.config.enable_chat_logs) {
                 let logref = this.chat_channel.messages.fetch({limit:1}).then(logref => {
-                        embed.setDescription(`A report has been issued: ${msg}\n\n[View chat log at time of report](${logref.url})`);
+                        if(logref) {
+                            embed.setDescription(`A report has been issued: ${msg}\n\n[View chat log at time of report](${logref.url})`);
+                        } else {
+                            embed.setDescription(`A report has been issued: ${msg}`);
+                        }
 
                         let discordMessage = new Discord.APIMessage(this.mod_channel,
                             {content: this.config.mod_msg_prefix, embed: embed});
