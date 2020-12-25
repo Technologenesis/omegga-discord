@@ -110,22 +110,32 @@ class DiscordIntegrationPlugin {
                 .setAuthor(name);
 
             if(this.config.enable_chat_logs) {
-                let logref = this.chat_channel.messages.fetch({limit:1}).then(logref =>
-                    embed.setDescription(`A report has been issued: ${msg}\n\n[View chat log at time of report](${logref.url})`)
+                let logref = this.chat_channel.messages.fetch({limit:1}).then(logref => {
+                    embed.setDescription(`A report has been issued: ${msg}\n\n[View chat log at time of report](${logref.url})`);
+
+                    let discordMessage = new Discord.APIMessage(this.mod_channel,
+                        {content: this.config.mod_msg_prefix, embed: embed});
+
+                    this.mod_channel.send(discordMessage)
+                        .then(_ => // todo: differentiate between user and role
+                            this.omegga.whisper(name, `"Your report has been issued to the moderators: \\"${msg}\\""`))
+                        .catch(msg =>
+                            this.omegga.whisper(name, `Failed to issue report: ${msg}`)
+                        );
                 );
             } else {
                 embed.setDescription(`A report has been issued: ${msg}`);
+
+                let discordMessage = new Discord.APIMessage(this.mod_channel,
+                    {content: this.config.mod_msg_prefix, embed: embed});
+
+                this.mod_channel.send(discordMessage)
+                    .then(_ => // todo: differentiate between user and role
+                        this.omegga.whisper(name, `"Your report has been issued to the moderators: \\"${msg}\\""`))
+                    .catch(msg =>
+                        this.omegga.whisper(name, `Failed to issue report: ${msg}`)
+                    );
             }
-
-            let discordMessage = new Discord.APIMessage(this.mod_channel,
-                {content: this.config.mod_msg_prefix, embed: embed});
-
-            this.mod_channel.send(discordMessage)
-                .then(_ => // todo: differentiate between user and role
-                    this.omegga.whisper(name, `"Your report has been issued to the moderators: \\"${msg}\\""`))
-                .catch(msg =>
-                    this.omegga.whisper(name, `Failed to issue report: ${msg}`)
-                );
         })
 
         // chat log
