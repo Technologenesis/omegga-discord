@@ -21,6 +21,9 @@ class ConfigObject {
         if(this.enable_godspeak_for_users && !this.chat_channel_id) {
             throw "chat-channel-id is required if enable-godspeak-for-users is true";
         }
+        if(this.chat_channel_id == this.mod_channel_id) {
+            throw "chat-channel-id must be different from mod-channel-id";
+        }
 
         if(!this.mod_channel_id && !this.chat_channel_id) {
             throw "config is missing both mod-channel-id and chat-channel-id; one must be present";
@@ -34,6 +37,12 @@ class ConfigObject {
         }
         if (this.enable_console_logs && !this.log_channel_id) {
             throw "config log-channel-id must be present if enable-console-logs is true";
+        }
+        if (this.log_channel_id == this.mod_channel_id) {
+            throw "log-channel-id must be different from mod-channel-id";
+        }
+        if (this.log_channel_id == this.chat_channel_id) {
+            throw "log-channel-id must be different from chat-channel-id";
         }
 
         this.mod_msg_prefix = configMap["mod-tag-id"] ? `<@${configMap["mod-tag-id"]}> ` : ``;
@@ -129,25 +138,39 @@ class DiscordIntegrationPlugin {
         }
 
         // deal with discord messages in relevant channels
-        // TODO
-        /*
-        if(this.config.EnableGodspeakForUsers || this.config.EnableGodspeakForMods || this.config.EnableRemoteCommands) {
+        // don't bother setting up the callback if we don't need to
+        if(this.config.enable_godspeak_for_users || this.config.enable_godspeak_for_mods
+            || this.config.enable_remote_commands) {
             this.discordClient.on("message", msg => {
-                if(msg.channel == this.chat_channel) {
-                    if(this.config.enableGodSpeakForUsers) {
 
-                    }
-                } else if(msg.channel == this.mod_channel) {
-                    if(this.config.EnableRemoteCommands) {
-                        asCmd = msg.match(/!exec (.*)/);
-                        if(asCmd) {
-                            this.omegga.exe
-                        }
-                    }
+                //user godspeak
+                if(msg.channel == this.chat_channel && this.config.enable_godspeak_for_users
+                    && msg.author.id != this.discordClient.user.id) {
+                    this.omegga.broadcast(`<b><color=\"#ffff00\">${
+                        msg.author.username
+                    }</color><color=\"#7289da\"> [discord]</color></b><color=\"ffffff\">: ${
+                        msg.content
+                    }</color>`);
                 }
+
+                //mod godspeak
+                else if(msg.channel == this.mod_channel && this.config.enable_godspeak_for_mods
+                    && msg.author.id != this.discordClient.user.id) {
+                    this.omegga.broadcast(`<b><color=\"#ff0000\">${
+                        msg.author.username
+                    } [mod]</color><color=\"#7289da\"> [discord]</color></b><color=\"ffffff\">: ${
+                        msg.content
+                    }</color>`);
+                }
+
+                // remote commands
+                else if (msg.channel == this.log_channel && this.config.enable_remote_commands
+                    && msg.author.id != this.discordClient.user.id) {
+                    this.omegga.writeln(msg.content);
+                }
+
             });
         }
-        */
 
         // Todo: allow moderators to execute commands from discord
     }
