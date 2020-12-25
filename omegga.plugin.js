@@ -112,8 +112,8 @@ class DiscordIntegrationPlugin {
             if(this.config.enable_chat_logs) {
                 let logref = this.chat_channel.messages.fetch({limit:1}).then(logref => {
                         if(logref) {
-                            console.log("Report issued for " + logref[0].url);
-                            embed.setDescription(`A report has been issued: ${msg}\n\n[View chat log at time of report](${logref[0].url})`);
+                            console.log("Report issued for " + logref[0].value.url);
+                            embed.setDescription(`A report has been issued: ${msg}\n\n[View chat log at time of report](${logref[0].value.url})`);
                         } else {
                             embed.setDescription(`A report has been issued: ${msg}`);
                         }
