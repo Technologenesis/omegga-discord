@@ -55,7 +55,7 @@
   },
   "commands": [
     {
-      "name": "!mod",
+      "name": "/report",
       "description": "submits a report to the moderator",
       "example": "!mod <player> is griefing"
     }

@@ -44,6 +44,13 @@ class ConfigObject {
         }
 
         this.mod_tag_id = configMap["mod-tag-id"]
+        if(this.enable_remote_commands && !this.mod_tag_id) {
+            throw "mod-tag-id is required if enable-remote-commands is true";
+        }
+        if(this.enable_godspeak_for_mods && !this.mod_tag_id) {
+            throw "mod-tag-id is required if enable-godspeak-for-mods is true";
+        }
+
         this.mod_msg_prefix = configMap["mod-tag-id"] ? `<@&${configMap["mod-tag-id"]}> ` : ``;
     }
 }
@@ -51,58 +58,16 @@ class ConfigObject {
 class DiscordIntegrationPlugin {
     constructor(omegga, config) {
         this.omegga = omegga;
+        console.log("Validating Omegga-Discord config...")
         this.config = new ConfigObject(config);
-    }
-
-    // map from chatcmds to associated function
-    cmdFuncs = {
-        //!mod <report message>
-        "mod": (name, logref, ...args) => {
-            let msg = args.join(" ");
-
-            let embed = new Discord.MessageEmbed()
-                .setColor("#ff0000")
-                .setTitle("Report")
-                .setAuthor(name)
-
-            if(logref) {
-                embed.setDescription(`A [report](${logref.url}) has been issued: ${msg}`)
-            } else {
-                embed.setDescription(`A report has been issued: ${msg}`)
-            }
-
-            let discordMessage = new Discord.APIMessage(this.mod_channel,
-                {content: this.config.mod_msg_prefix, embed: embed});
-
-            this.mod_channel.send(discordMessage)
-                .then(_ => // todo: differentiate between user and role
-                    this.omegga.whisper(name, `"Your report has been issued to the moderators: \\"${msg}\\""`))
-                .catch(msg =>
-                    this.omegga.whisper(name, `Failed to issue report: ${msg}`)
-                );
-        }
-    };
-
-    // Todo: Add support for tagging in-game
-    // helper function for interpreting chat commands
-    InterpretChatCMD(name, msg, logref) {
-        if(msg.startsWith("!")) {
-            let cmd = msg.slice(1);
-            // group command into words separated by spaces, OR any number of words grouped into quotes
-            let args = cmd.match(/("[^"]+"\s*|'[^']+'\s*|[^\s"']+)/g);
-            if(cmd) {
-                let cmdFunc = this.cmdFuncs[args[0]];
-                if(cmdFunc) {
-                    cmdFunc(name, logref, ...args.slice(1));
-                }
-            }
-        }
     }
 
     async init() {
         // log into discord
         this.discordClient = new Discord.Client();
+        console.log("Logging in to discord...");
         await this.discordClient.login(this.config.token);
+        console.log("Logged in as " + this.discordClient.user.username);
 
         // Resolve channels to avoid fetching each time
         // todo: Does this need to be done serially?
@@ -118,11 +83,25 @@ class DiscordIntegrationPlugin {
             await this.discordClient.channels.fetch(this.config.log_channel_id) :
             null;
 
+        console.log("Server: " + this.guild.name);
+        console.log("Mod Channel: " + this.mod_channel.name + (this.mod_role ? " (mod role: @" + this.mod_role.name + ")" : ""));
+        if(!this.mod_channel.isText()) {
+            throw "mod channel must be a text channel"
+        }
+        console.log("Chat Channel: " + this.chat_channel.name);
+        if(!this.chat_channel.isText()) {
+            throw "chat channel must be a text channel"
+        }
+        console.log("Log Channel: " + this.log_channel.name);
+        if(!this.log_channel.isText()) {
+            throw "log channel must be a text channel"
+        }
+
 
         // todo: bind in-game users to discord users
 
         // commands
-        this.omegga.on("cmd:mod", (name, ...args) => {
+        this.omegga.on("cmd:report", (name, ...args) => {
             let msg = args.join(" ");
 
             let embed = new Discord.MessageEmbed()
@@ -131,8 +110,9 @@ class DiscordIntegrationPlugin {
                 .setAuthor(name);
 
             if(this.config.enable_chat_logs) {
-                let logref = this.chat_channel.lastMessage.url;
-                embed.setDescription(`A report has been issued: ${msg}\n\n[View chat log at time of report](${logref})`);
+                let logref = this.chat_channel.messages.fetch({limit:1}).then(logref =>
+                    embed.setDescription(`A report has been issued: ${msg}\n\n[View chat log at time of report](${logref.url})`);
+                );
             } else {
                 embed.setDescription(`A report has been issued: ${msg}`);
             }
@@ -149,17 +129,14 @@ class DiscordIntegrationPlugin {
         })
 
         // chat log
-        this.omegga.on("chat", (name, msg) => {
-            if(this.config.enable_chat_logs) {
+        if(this.config.enable_chat_logs) {
+            this.omegga.on("chat", (name, msg) => {
                 // If there's a chat log, send to the chat log first, THEN check for command command with reference to
                 // chat log
                 let embed = new Discord.MessageEmbed().setAuthor(name).setDescription(msg);
-                this.chat_channel.send(embed).then(logref => this.InterpretChatCMD(name, msg, logref));
-            } else {
-                // Otherwise just check for command with no log message
-                this.InterpretChatCMD(name, msg, null);
-            }
-        });
+                this.chat_channel.send(embed);//.then(logref => this.InterpretChatCMD(name, msg, logref));
+            });
+        }
 
         // stream console logs
         if(this.config.enable_console_logs) {
@@ -201,8 +178,8 @@ class DiscordIntegrationPlugin {
 
             });
         }
-
         // Todo: allow moderators to execute commands from discord
+        console.log("Init complete.");
     }
 
     async stop() {}
