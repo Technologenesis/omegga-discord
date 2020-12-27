@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const ConfigRequirements = require("./config-requirements");
 
-function log_chats(omegga, discordClient, config, this.store) {
+function log_chats(omegga, discordClient, config) {
     // make sure all required config items are present
     let missing_reqs = ConfigRequirements.check_requirements(config, ["chat-channel-id"]);
     if(missing_reqs.length !== 0) {

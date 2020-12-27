@@ -3,7 +3,7 @@ const ConfigRequirements = require("./config-requirements");
 function setup_player_verification(omegga, discordClient, config, store) {
     missing_reqs = ConfigRequirements.check_requirements(config, ["verify-timeout"]);
     if(missing_reqs.length !== 0) {
-        throw "The following configs are required for mod commands, but were not found:\n" + missing_reqs.toString();
+        throw "The following configs are required for player verification, but were not found:\n" + missing_reqs.toString();
     }
     codeMap = {};
 
@@ -27,8 +27,10 @@ function setup_player_verification(omegga, discordClient, config, store) {
         }
         store.get("verified-players")
             .then(verified_players => {
-                if(verified_players && get_discord_name(verified_players, args[0])) {
-                    omegga.whisper(name, get_discord_name(verified_players, args[0]))
+                if(verified_players && get_discord_id(verified_players, args[0])) {
+                    discordClient.users.fetch(get_discord_id(verified_players, args[0])).then(user => {
+                        omegga.whisper(name, user.username);
+                    }).catch(_ => omegga.whisper(name, "Could not find user! Sounds like a caching error. If you see this message, please report it to the maintainer"));
                 } else {
                     omegga.whisper(name, "Could not find player " + args[0]);
                 }
@@ -45,9 +47,9 @@ function setup_player_verification(omegga, discordClient, config, store) {
                 if (name) {
                     msg.reply("Hi, " + name + "! Saving your verification status...");
                     store.get("verified-players").then(verified_players =>
-                        set(verified_players, store, msg.author.username, name)
+                        set(verified_players, store, msg.author.id, name)
                     ).catch(_ =>
-                        set(new VerifiedPlayerMap(), store, msg.author.username, name)
+                        set(new VerifiedPlayerMap(), store, msg.author.id, name)
                     ).finally(() => {
                         delete codeMap[code];
                         msg.reply("Thanks! Your character '" + name + "' has been verified!");
@@ -75,11 +77,11 @@ function set(player_map, store, discord_name, brickadia_name) {
     return store.set("verified-players", player_map);
 }
 
-function get_brickadia_name(player_map, discord_name) {
-    return player_map.discord_to_brickadia[discord_name];
+function get_brickadia_name(player_map, discord_id) {
+    return player_map.discord_to_brickadia[discord_id];
 }
 
-function get_discord_name(player_map, brickadia_name) {
+function get_discord_id(player_map, brickadia_name) {
     return player_map.brickadia_to_discord[brickadia_name];
 }
 

@@ -4,6 +4,7 @@ const log_reports = require('./report-logger');
 const log_console = require('./console-logger');
 const setup_godspeak = require('./godspeak');
 const setup_player_verification = require('./player-verification');
+const setup_tracking_ingame_players = require('./ingame-tracking');
 
 // Todo: string localization?
 
@@ -51,6 +52,11 @@ class DiscordIntegrationPlugin {
         if(this.config["enable-player-verification"]) {
             setup_player_verification(this.omegga, this.discordClient, this.config, this.store);
             console.log("Set up player verification");
+        }
+
+        // track in-game players
+        if(this.config["enable-tracking-ingame-players"]) {
+            setup_tracking_ingame_players(this.omegga, this.discordClient, this.config, this.store);
         }
 
         // TODO: discord mod commands
