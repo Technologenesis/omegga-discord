@@ -6,7 +6,7 @@ function log_reports(omegga, discordClient, config) {
     // make sure all required config items are present
     let missing_reqs = ConfigRequirements.check_requirements(config, ["mod-channel-id"]);
     if(missing_reqs.length !== 0) {
-        throw "The following configs are required for mod commands, but were not found:\n" + missing_reqs.toString();
+        throw "The following configs are required for logging reports, but were not found:\n" + missing_reqs.toString();
     }
 
     let mod_channel_promise = discordClient.channels.fetch(config["mod-channel-id"]);

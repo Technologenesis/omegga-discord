@@ -7,6 +7,12 @@ function setup_tracking_ingame_players(omegga, discordClient, config, store) {
     }
 
     discordClient.roles.fetch(config["ingame-role"])
+        .then(ingame_role => {
+            initialize_role(omegga, discordClient, ingame_role);
+
+            omegga.on("join")
+        })
+        .catch(reason => {throw "Could not fetch ingame-role: " + reason});
 }
 
 module.exports = setup_tracking_ingame_players;

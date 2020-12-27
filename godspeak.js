@@ -5,7 +5,7 @@ function setup_godspeak(omegga, discordClient, config) {
         ["chat-channel-id"]
     );
     if(missing_reqs.length !== 0) {
-        throw "The following configs are required for mod commands, but were not found:\n" + missing_reqs.toString();
+        throw "The following configs are required for godspeak, but were not found:\n" + missing_reqs.toString();
     }
 
     discordClient.channels.fetch(config["chat-channel-id"]).then(chat_channel => {
