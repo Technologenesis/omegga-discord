@@ -1,88 +1,82 @@
 const ConfigRequirements = require("./config-requirements");
 
-function setup_player_verification(omegga, discordClient, config, store) {
-    missing_reqs = ConfigRequirements.check_requirements(config, ["verify-timeout"]);
-    if(missing_reqs.length !== 0) {
-        throw "The following configs are required for player verification, but were not found:\n" + missing_reqs.toString();
+class PlayerVerifier {
+    constructor(pluginCtx) {
+        this.pluginCtx = pluginCtx;
+        this.codeMap = {};
+        this.setup_player_verification(pluginCtx.omegga, pluginCtx.discordClient, pluginCtx.config);
     }
-    codeMap = {};
 
-    omegga.on("cmd:verify", (name, ...args) => {
-        let code = generate_code();
-        while (codeMap[code]) {
-            code = generate_code();
+    setup_player_verification(omegga, discordClient, config) {
+        let missing_reqs = ConfigRequirements.check_requirements(config, ["verify-timeout"]);
+        if(missing_reqs.length !== 0) {
+            throw "The following configs are required for player verification, but were not found:\n" + missing_reqs.toString();
         }
-        codeMap[code] = name;
-        setTimeout(() => {
-            delete codeMap[code]
-        }, config["verify-timeout"] * 6000);
-        omegga.whisper(name, "To verify your in-game character, DM the following code to " + discordClient.user.username
-            + " in the Discord server within the next " + config["verify-timeout"] + " minutes: " + code);
-    });
 
-
-    omegga.on("cmd:whois", (name, ...args) => {
-        if(!args[0]) {
-            omegga.whisper(name, "Usage: /whois <playername>");
-        }
-        store.get("verified-players")
-            .then(verified_players => {
-                if(verified_players && get_discord_id(verified_players, args[0])) {
-                    discordClient.users.fetch(get_discord_id(verified_players, args[0])).then(user => {
-                        omegga.whisper(name, user.username);
-                    }).catch(_ => omegga.whisper(name, "Could not find user! Sounds like a caching error. If you see this message, please report it to the maintainer"));
-                } else {
-                    omegga.whisper(name, "Could not find player " + args[0]);
-                }
-            })
-            .catch(omegga.whisper("Could not fetch verified player store."));
-    });
-
-    discordClient.on("message", msg => {
-        if (msg.channel.type === "dm" && msg.author.id !== discordClient.user.id) {
-            let match = msg.content.toString().match(/\d{4}/);
-            if (match) {
-                let code = match[0];
-                let name = codeMap[code];
-                if (name) {
-                    msg.reply("Hi, " + name + "! Saving your verification status...");
-                    store.get("verified-players").then(verified_players =>
-                        set(verified_players, store, msg.author.id, name)
-                    ).catch(_ =>
-                        set(new VerifiedPlayerMap(), store, msg.author.id, name)
-                    ).finally(() => {
-                        delete codeMap[code];
-                        msg.reply("Thanks! Your character '" + name + "' has been verified!");
-                    });
-                } else {
-                    msg.reply("I couldn't find that verification code! Use /verify in-game to get a verification code.");
-                }
-            } else {
-                msg.reply("I couldn't find a verification code in your message. Use /verify in-game to get a verification code.");
+        omegga.on("cmd:verify", (name) => {
+            let code = generate_code();
+            while (this.codeMap[code]) {
+                code = generate_code();
             }
-        }
-    });
-}
+            this.codeMap[code] = name;
+            setTimeout(() => {
+                delete this.codeMap[code]
+            }, config["verify-timeout"] * 6000);
+            omegga.whisper(name, "To verify your in-game character, DM the following code to " + discordClient.user.username
+                + " in the Discord server within the next " + config["verify-timeout"] + " minutes: " + code);
+        });
 
-class VerifiedPlayerMap {
-    constructor() {
-        this.discord_to_brickadia = {};
-        this.brickadia_to_discord = {};
+
+        omegga.on("cmd:whois", (name, ...args) => {
+            if(!args[0]) {
+                omegga.whisper(name, "Usage: /whois <playername>");
+            }
+
+            this.fetch_discord_id(args[0])
+                .then(id => discordClient.users.fetch(id))
+                .then(user => omegga.whisper(name, user.username))
+                .catch(reason => "Found no verified user by that name (" + reason + ")");
+        });
+
+        discordClient.on("message", msg => {
+            if (msg.channel.type === "dm" && msg.author.id !== discordClient.user.id) {
+                let match = msg.content.toString().match(/\d{4}/);
+                if (match) {
+                    let code = match[0];
+                    let name = this.codeMap[code];
+                    if (name) {
+                        msg.reply("Hi, " + name + "! Saving your verification status...");
+                        this.set(msg.author.id, name).then(() => {
+                            delete this.codeMap[code];
+                            msg.reply("Thanks! Your character '" + name + "' has been verified!");
+                        }).catch(reason => msg.reply("Error verifying character: " + reason));
+                    } else {
+                        msg.reply("I couldn't find that verification code! Use /verify in-game to get a verification code.");
+                    }
+                } else {
+                    msg.reply("I couldn't find a verification code in your message. Use /verify in-game to get a verification code.");
+                }
+            }
+        });
     }
-}
 
-function set(player_map, store, discord_name, brickadia_name) {
-    player_map.discord_to_brickadia[discord_name] = brickadia_name;
-    player_map.brickadia_to_discord[brickadia_name] = discord_name;
-    return store.set("verified-players", player_map);
-}
+    set(discord_id, brickadia_name) {
+        return this.pluginCtx.store.get("verified-players").then(verified_players => {
+            verified_players.discord_to_brickadia[discord_id] = brickadia_name;
+            verified_players.brickadia_to_discord[brickadia_name] = discord_id;
+            return this.pluginCtx.store.set("verified-players", verified_players);
+        }).catch(_ => {
+            let verified_players = {brickadia_to_discord: {}, discord_to_brickadia: {}};
+            verified_players.discord_to_brickadia[discord_id] = brickadia_name;
+            verified_players.brickadia_to_discord[brickadia_name] = discord_id;
+            return this.pluginCtx.store.set("verified-players", verified_players);
+        });
+    }
 
-function get_brickadia_name(player_map, discord_id) {
-    return player_map.discord_to_brickadia[discord_id];
-}
-
-function get_discord_id(player_map, brickadia_name) {
-    return player_map.brickadia_to_discord[brickadia_name];
+    fetch_discord_id(brickadia_name) {
+        return this.pluginCtx.store.get("verified-players")
+            .then(verified_players => verified_players.brickadia_to_discord[brickadia_name]);
+    }
 }
 
 function generate_code() {
@@ -95,4 +89,4 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
-module.exports = setup_player_verification;
+module.exports = PlayerVerifier;

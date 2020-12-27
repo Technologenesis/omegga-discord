@@ -1,4 +1,5 @@
 const ConfigRequirements = require('./config-requirements');
+PlayerVerification = require('/player-verification');
 
 function setup_tracking_ingame_players(omegga, discordClient, config, store) {
     let missing_reqs = ConfigRequirements.check_requirements(config, ["enable-player-verification", "ingame-role"]);
@@ -10,7 +11,12 @@ function setup_tracking_ingame_players(omegga, discordClient, config, store) {
         .then(ingame_role => {
             initialize_role(omegga, discordClient, ingame_role);
 
-            omegga.on("join")
+            omegga.on("join", (name) => {
+                store.get("verified-players")
+                    .then(verified_players => {
+                        discord_id =
+                    })
+            })
         })
         .catch(reason => {throw "Could not fetch ingame-role: " + reason});
 }
