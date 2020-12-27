@@ -35,7 +35,7 @@ class PlayerVerifier {
             this.fetch_discord_id(args[0])
                 .then(id => discordClient.users.fetch(id))
                 .then(user => omegga.whisper(name, user.username))
-                .catch(reason => "Found no verified user by that name (" + reason + ")");
+                .catch(reason => omegga.whisper("Found no verified user by that name (" + reason + ")"));
         });
 
         discordClient.on("message", msg => {
