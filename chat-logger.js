@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const ConfigRequirements = require("./config-requirements");
 
-function log_chats(omegga, discordClient, config) {
+function log_chats(omegga, discordClient, config, this.store) {
     // make sure all required config items are present
     let missing_reqs = ConfigRequirements.check_requirements(config, ["chat-channel-id"]);
     if(missing_reqs.length !== 0) {
@@ -14,12 +14,14 @@ function log_chats(omegga, discordClient, config) {
             chat_channel.send(embed);
         });
 
+        /*
         omegga.on("line", logline => {
             let logChat = logline.match(/\[\d+\.\d+\.\d+-\d+\.\d+\.\d+:\d+\]\[[\s\d]+\]LogChat: (.*)/);
             if (logChat) {
                 chat_channel.send(logChat[1]);
             }
         });
+         */
     }).catch(reason => {throw "failed to get chat channel: " + reason.toString()});
 }
 
