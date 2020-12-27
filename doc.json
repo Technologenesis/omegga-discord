@@ -37,11 +37,6 @@
       "type": "boolean",
       "default": false
     },
-    "enable-remote-commands": {
-      "description": "Allow commands in mod channel? IF THIS IS ENABLED, MAKE SURE YOUR MOD CHANNEL HAS MESSAGES RESTRICTED",
-      "type": "boolean",
-      "default": false
-    },
     "enable-console-logs": {
       "description": "Should console logs be sent to the log channel?",
       "type": "boolean",
@@ -51,6 +46,16 @@
       "description": "Should chat logs be sent to the chat channel?",
       "type": "boolean",
       "default": false
+    },
+    "enable-player-verification": {
+      "description": "Allow players to verify their Discord accounts?",
+      "type": "boolean",
+      "default": true
+    },
+    "verify-timeout": {
+      "description": "Allotted time to verify after receiving a code",
+      "type": "number",
+      "default": 5
     }
   },
   "commands": [

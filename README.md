@@ -48,7 +48,7 @@ All configuration is handled through the Omegga web interface.
 |-------|-------------|---------|----------|-------------|
 | token | The authorization token for your bot account | None | **Yes**
 | guild-id | The ID of the discord server | None | Yes | Be sure to invite the bot to your server using the guide linked above|
-| mod-channel-id | The ID[*](#discordids) of the channel or user for your bot to post mod-only messages to | None; if missing, mod-only messages will be posted to `chat-channel-id` | **Required** if `chat-channel-id` is not supplied | Ensure that your bot is permitted to send messages in the given channel
+| mod-channel-id | The ID[*](#discordids) of the channel or user for your bot to post mod-only messages to | None | Yes | Ensure that your bot is permitted to send messages in the given channel
 | mod-tag-id | The ID[*](#discordids) of the role to @mention when posting mod-only messages | None | **Required** if `enable-godspeak-for-mods` or `enable-remote-commands` are true | If supplied, the bot will need permission to mention the given role or user
 | chat-channel-id | The ID[*](#discordids) of the user or channel in which to log in-game chat | None | **Required** if `mod-channel-id` is not supplied, or if any of `enable-chat-log`, `enable-godspeak-for-users`, or `enable-godspeak-for-mods` is true. | Ensure that your bot is permitted to send messages in the given channel
 | log-channel-id | the ID[*](#discordids) of the user or channel in which to log in-game chat | None | **Required** if either of `enable-console-logs` or `enable-remote-commands` are enabled. **Be sure to restrict access to this channel**
