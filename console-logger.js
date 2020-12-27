@@ -2,7 +2,7 @@ const ConfigRequirements = require("./config-requirements");
 
 function log_console(omegga, discordClient, config) {
     let missing_reqs = ConfigRequirements.check_requirements(config, ["log-channel-id"]);
-    if(missing_reqs) {
+    if(missing_reqs.length !== 0) {
         throw "The following configs are required for console logging, but were not found:\n" + missing_reqs.toString();
     }
 

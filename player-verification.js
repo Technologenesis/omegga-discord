@@ -1,7 +1,10 @@
 const ConfigRequirements = require("./config-requirements");
 
 function setup_player_verification(omegga, discordClient, config, store) {
-    ConfigRequirements.check_requirements(config, ["verify-timeout"]);
+    missing_reqs = ConfigRequirements.check_requirements(config, ["verify-timeout"]);
+    if(missing_reqs.length !== 0) {
+        throw "The following configs are required for mod commands, but were not found:\n" + missing_reqs.toString();
+    }
     codeMap = {};
 
     omegga.on("cmd:verify", (name, ...args) => {
