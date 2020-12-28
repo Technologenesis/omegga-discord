@@ -37,12 +37,14 @@ function setup_tracking_ingame_players(omegga, discordClient, config, player_ver
                     throw "failed to set up role tracking: " + reason;
                 });
         })
+        .catch(reason => {
+            throw reason;
+        });
 }
 
 function poll_online_players(omegga, role, player_verifier) {// clear all role members
     role.guild.members.fetch().then(members => {
         for (let member of members.array()) {
-            console.log(member.user.username);
             member.roles.remove(role.id).catch(reason => {
                 throw "Failed to remove role: " + reason
             });
@@ -50,7 +52,6 @@ function poll_online_players(omegga, role, player_verifier) {// clear all role m
 
         // add currently in-game players to role
         for (let player of omegga.getPlayers()) {
-            console.log(player.name);
             player_verifier.fetch_discord_id(player.name)
                 .then(id => role.guild.members.fetch(id))
                 .then(member => member.roles.add(role))
