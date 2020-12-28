@@ -11,8 +11,6 @@ in-game players and Discord members to interact through chat features.
 - [Installation](#installation)
 - [Setup](#setup)
 - [Configuration](#configuration)
-- [Usage](#usage)
-- [Planned Features](#planned-features)
 
 ## Features
 
