@@ -32,10 +32,11 @@ class PlayerVerifier {
                 omegga.whisper(name, "Usage: /whois <playername>");
             }
 
-            this.fetch_discord_id([args].join(" "))
+            name = [args].join(" ");
+            this.fetch_discord_id(name)
                 .then(id => discordClient.users.fetch(id))
                 .then(user => omegga.whisper(name, user.username))
-                .catch(reason => omegga.whisper(name, "Found no verified user by that name (" + reason + ")"));
+                .catch(reason => omegga.whisper(name, "Found no verified user by the name '" + name + "' (" + reason + ")"));
         });
 
         discordClient.on("message", msg => {
