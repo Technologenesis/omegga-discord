@@ -30,6 +30,7 @@ class PlayerVerifier {
         omegga.on("cmd:whois", (name, ...args) => {
             if(!args[0]) {
                 omegga.whisper(name, "Usage: /whois \\<playername\\>");
+                return;
             }
 
             let searchedName = args.join(" ");
