@@ -4,7 +4,7 @@ const log_reports = require('./report-logger');
 const log_console = require('./console-logger');
 const setup_godspeak = require('./godspeak');
 const PlayerVerifier = require('./player-verification');
-//const setup_tracking_ingame_players = require('./ingame-tracking');
+const setup_tracking_ingame_players = require('./ingame-tracking');
 
 // Todo: string localization?
 
@@ -42,25 +42,23 @@ class DiscordIntegrationPlugin {
             console.log("Set up console logger");
         }
 
-        // godspeak
-        if(this.config["enable-godspeak-for-users"] || this.config["enable-godspeak-for-mods"]) {
-            setup_godspeak(this.omegga, this.discordClient, this.config);
-            console.log("Set up godspeak");
-        }
-
         // player verification
         if(this.config["enable-player-verification"]) {
             this.player_verifier = new PlayerVerifier(this);
             console.log("Set up player verification");
         }
 
-        /*
+        // godspeak
+        if(this.config["enable-godspeak-for-users"] || this.config["enable-godspeak-for-mods"]) {
+            setup_godspeak(this.omegga, this.discordClient, this.config);
+            console.log("Set up godspeak");
+        }
+
         // track in-game players
         if(this.config["enable-tracking-ingame-players"]) {
-            setup_tracking_ingame_players(this.omegga, this.discordClient, this.config, this.store);
+            setup_tracking_ingame_players(this.omegga, this.discordClient, this.config, this.player_verifier);
+            console.log("Set up in-game player tracking");
         }
-        
-         */
 
         // TODO: discord mod commands
         // WIP

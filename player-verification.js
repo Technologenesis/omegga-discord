@@ -21,7 +21,7 @@ class PlayerVerifier {
             this.codeMap[code] = name;
             setTimeout(() => {
                 delete this.codeMap[code]
-            }, config["verify-timeout"] * 6000);
+            }, config["verify-timeout"] * 60000);
             omegga.whisper(name, "To verify your in-game character, DM the following code to " + discordClient.user.username
                 + " in the Discord server within the next " + config["verify-timeout"] + " minutes: " + code);
         });
@@ -32,7 +32,7 @@ class PlayerVerifier {
                 omegga.whisper(name, "Usage: /whois <playername>");
             }
 
-            this.fetch_discord_id(args[0])
+            this.fetch_discord_id([args].join(" "))
                 .then(id => discordClient.users.fetch(id))
                 .then(user => omegga.whisper(name, user.username))
                 .catch(reason => omegga.whisper(name, "Found no verified user by that name (" + reason + ")"));
@@ -75,7 +75,9 @@ class PlayerVerifier {
 
     fetch_discord_id(brickadia_name) {
         return this.pluginCtx.store.get("verified-players")
-            .then(verified_players => verified_players.brickadia_to_discord[brickadia_name]);
+            .then(
+                verified_players => verified_players.brickadia_to_discord[brickadia_name]
+            );
     }
 }
 

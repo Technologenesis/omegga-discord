@@ -7,26 +7,6 @@
       "description": "The authorization token for the bot to use",
       "type": "string"
     },
-    "guild-id": {
-      "description": "The ID of the Discord server",
-      "type": "string"
-    },
-    "mod-channel-id": {
-      "description": "The ID of the channel to post mod messages to",
-      "type": "string"
-    },
-    "log-channel-id": {
-      "description": "The ID of the channel to post console logs to, and to read console commands from",
-      "type": "string"
-    },
-    "mod-tag-id": {
-      "description": "The ID of the user or role to be tagged in reports",
-      "type": "string"
-    },
-    "chat-channel-id": {
-      "description": "The ID of the channel to post chat logs to",
-      "type": "string"
-    },
     "enable-godspeak-for-mods": {
       "description": "Should messages in mod channel be relayed to in-game chat?",
       "type": "boolean",
@@ -51,6 +31,35 @@
       "description": "Allow players to verify their Discord accounts?",
       "type": "boolean",
       "default": true
+    },
+    "enable-tracking-ingame-players": {
+      "description": "Use a role to show which verified players are online?",
+      "type": "boolean",
+      "default": false
+    },
+    "guild-id": {
+      "description": "The ID of the Discord server",
+      "type": "string"
+    },
+    "mod-channel-id": {
+      "description": "The ID of the channel to post mod messages to",
+      "type": "string"
+    },
+    "log-channel-id": {
+      "description": "The ID of the channel to post console logs to, and to read console commands from",
+      "type": "string"
+    },
+    "mod-tag-id": {
+      "description": "The ID of the user or role to be tagged in reports",
+      "type": "string"
+    },
+    "chat-channel-id": {
+      "description": "The ID of the channel to post chat logs to",
+      "type": "string"
+    },
+    "ingame-role": {
+      "description": "What role to use for marking in-game players",
+      "type": "string"
     },
     "verify-timeout": {
       "description": "Allotted time to verify after receiving a code",
