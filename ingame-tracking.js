@@ -22,14 +22,14 @@ function setup_tracking_ingame_players(omegga, discordClient, config, player_ver
                         player_verifier.fetch_discord_id(player.name)
                             .then(id => role.guild.members.fetch(id))
                             .then(member => member.roles.add(role))
-                            .catch(reason => console.log("Not adding role to " + player.name + ": " + reason));
+                            .catch();
                     });
 
                     omegga.on("leave", player => {
                         player_verifier.fetch_discord_id(player.name)
                             .then(id => role.guild.members.fetch(id))
                             .then(member => member.roles.remove(role))
-                            .catch(reason => console.log("Not removing role from " + player.name + ": " + reason));
+                            .catch();
                     });
 
                 })
@@ -55,7 +55,7 @@ function poll_online_players(omegga, role, player_verifier) {// clear all role m
             player_verifier.fetch_discord_id(player.name)
                 .then(id => role.guild.members.fetch(id))
                 .then(member => member.roles.add(role))
-                .catch(reason => console.log("Not adding role to " + player.name + ": " + reason));
+                .catch();
         }
     }).catch(reason => console.error("Failed to fetch members: " + reason));
 }
