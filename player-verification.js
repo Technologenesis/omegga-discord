@@ -32,7 +32,7 @@ class PlayerVerifier {
                 omegga.whisper(name, "Usage: /whois <playername>");
             }
 
-            let searchedName = [args].join(" ");
+            let searchedName = args.join(" ");
             this.fetch_discord_id(searchedName)
                 .then(id => discordClient.users.fetch(id))
                 .then(user => omegga.whisper(name, user.username))
