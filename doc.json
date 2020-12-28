@@ -71,7 +71,17 @@
     {
       "name": "/report",
       "description": "submits a report to the moderator",
-      "example": "!mod <player> is griefing"
+      "example": "/report <player> is griefing"
+    },
+    {
+      "name": "/verify",
+      "description": "Get a verification code to verify a Discord accout",
+      "example": "/verify"
+    },
+    {
+      "name": "/whois",
+      "description": "Get the verified discord user associated with a player",
+      "example:": "/whois <player>"
     }
   ]
 }
