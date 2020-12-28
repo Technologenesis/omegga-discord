@@ -64,6 +64,8 @@ class DiscordIntegrationPlugin {
         // WIP
 
         console.log("Init complete.");
+
+        return {registeredCommands: ['report','verify','whois']};
     }
 
     async stop() {}
