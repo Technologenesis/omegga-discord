@@ -29,14 +29,28 @@ class PlayerVerifier {
 
         omegga.on("cmd:whois", (name, ...args) => {
             if(!args[0]) {
-                omegga.whisper(name, "Usage: /whois <playername>");
+                omegga.whisper(name, "Usage: /whois playername");
+                return;
             }
 
             let searchedName = args.join(" ");
-            this.fetch_discord_id(searchedName)
-                .then(id => discordClient.users.fetch(id))
-                .then(user => omegga.whisper(name, user.username))
-                .catch(reason => omegga.whisper(name, "Found no verified user by the name '" + searchedName + "' (" + reason + ")"));
+            this.search_discord_id(searchedName)
+                .then(results => {
+                    if(results && Object.keys(results).length !== 0) {
+                        let msg = "I found the following verified users that matched your search term:\n";
+                        let promises = [];
+                        for(let foundName in results) {
+                            promises.push(discordClient.users.fetch(results[foundName])
+                                .then(user => msg += foundName+" is verified on discord as @"+user.username+"\n")
+                                .catch(reason => msg += "error retrieving account for "+foundName+": ("+reason+")\n"));
+                        }
+                        Promise.all(promises).then(() => omegga.whisper(name, msg)).catch(reason => omegga.whisper(
+                            "failed to get search results: " + reason
+                        ));
+                    } else {
+                        omegga.whisper(name, "No players matched your search term.");
+                    }
+                })
         });
 
         discordClient.on("message", msg => {
@@ -80,6 +94,23 @@ class PlayerVerifier {
                 verified_players => verified_players.brickadia_to_discord[brickadia_name]
             );
     }
+
+    search_discord_id(brickadia_name) {
+        return this.pluginCtx.store.get("verified-players")
+            .then(
+                verified_players => best_guess(verified_players.brickadia_to_discord, brickadia_name)
+            );
+    }
+}
+
+function best_guess(dict, searchTerm) {
+    let results = {};
+    for (let key in dict) {
+        if(key.toString().toLowerCase().match(searchTerm.toLowerCase())) {
+            results[key] = dict[key];
+        }
+    }
+    return results;
 }
 
 function generate_code() {
