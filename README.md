@@ -7,11 +7,50 @@ in-game players and Discord members to interact through chat features.
 
 ## Contents
 
+- [Features](#features)
 - [Installation](#installation)
 - [Setup](#setup)
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [Planned Features](#planned-features)
+
+## Features
+
+Omegga-Discord has several distinct features that can be enabled or disabled mostly independently; take what you want,
+leave what you don't.  See the [configuration](#configuration) section for details.
+
+### Reporting
+
+Players can use the `/report` command to issue a report to a server's moderators, even when the mods aren't present in
+the server.
+
+![Using the report command in-game](Screenshots/report_brickadia.png)
+
+![Moderator view](Screenshots/report_discord.png)
+
+### Chat
+
+In-game chat logs can be routed to a Discord channel, and messages sent to that channel can be relayed to the in-game
+chat.
+
+![Chat from in-game](Screenshots/chat_brickadia.png)
+
+![Chat from Discord](Screenshots/chat_discord.png)
+
+### Player Verification
+
+In-game players can verify their Discord accounts with the `verify` command.  The `/whois` command can be used to show a
+player's Discord username.
+
+![Verify command](Screenshots/verify_brickadia.png)
+
+![Verifying with BrickadiaBot](Screenshots/verify_discord.png)
+
+### Tracking In-Game Players
+
+A custom role can be used to designate in-game players
+
+![A custom role showing in-game players](Screenshots/tracking.png)
 
 ## Installation
 
@@ -30,126 +69,47 @@ You will need to create your own Discord bot, give it the appropriate permission
 authorization token when configuring this plugin.  A detailed guide to setting up a Discord bot can be found
 [here](https://discordpy.readthedocs.io/en/latest/discord.html).
 
-The particular permissions your bot needs will depend on how you configure the plugin.  The default configuration will
-require the following permissions:
-
-- View Channels
-- Send Messages
-
-If you plan to modify a particular configuration option, you can see below what extra permissions your bot will need.
+The particular permissions your bot needs will depend on how you configure the plugin. Use the guide below to determine
+what permissions your bot will need for your purposes
 
 ## Configuration
 
-All configuration is handled through the Omegga web interface.
+All configuration is handled through the Omegga web interface.  The various features are enabled with the listed config
+options; each feature will require additional config options to be provided, or the plugin will not start correctly.
 
-**Config Options**
+**If you are having trouble starting the plugin, double check this guide and ensure that your config and permissions are
+set up accordingly.  Also be sure that you are using Discord IDs[*](#discordids) for your parameters, and double check
+that they're correct.
 
-| Name  | Description | Default | Required | Permissions |
-|-------|-------------|---------|----------|-------------|
-| token | The authorization token for your bot account | None | **Yes**
-| guild-id | The ID of the discord server | None | Yes | Be sure to invite the bot to your server using the guide linked above|
-| mod-channel-id | The ID[*](#discordids) of the channel or user for your bot to post mod-only messages to | None | Yes | Ensure that your bot is permitted to send messages in the given channel
-| mod-tag-id | The ID[*](#discordids) of the role to @mention when posting mod-only messages | None | **Required** if `enable-godspeak-for-mods` or `enable-remote-commands` are true | If supplied, the bot will need permission to mention the given role or user
-| chat-channel-id | The ID[*](#discordids) of the user or channel in which to log in-game chat | None | **Required** if `mod-channel-id` is not supplied, or if any of `enable-chat-log`, `enable-godspeak-for-users`, or `enable-godspeak-for-mods` is true. | Ensure that your bot is permitted to send messages in the given channel
-| log-channel-id | the ID[*](#discordids) of the user or channel in which to log in-game chat | None | **Required** if either of `enable-console-logs` or `enable-remote-commands` are enabled. **Be sure to restrict access to this channel**
-| enable-console-logs | Send console logs to `log-channel-id`? | false | | Ensure that your bot is permitted to send messages in `log-channel-id`
-| enable-godspeak-for-mods | If enabled, messages posted to `mod-channel-id` from Discord will be relayed to the in-game chat | true | | Ensure that your bot is permitted to read messages in `mod-channel-id`. Be sure only authorized users can post in this channel.
-| enable-godspeak-for-users | If enabled, messages posted to `chat-channel-id` from Discord will be relayed to the in-game chat | false | | Ensure that your bot is permitted to read messages in `chat-channel-id`
-| enable-remote-commands | If enabled, commands can be issued to `log-channel-id` from Discord | false | | Ensure that your bot is permitted to read messages in `log-channel-id`; **BE CERTAIN only those with the desired roles can post to `log-channel-id`** (To-Do: check issued commands against in-game roles)
-| enable-chat-log | Send chat logs to `chat-channel-id`? | false | | Ensure that your bot is permitted to send messages to `chat-channel-id`
+**Feature enablements**
 
-<sup><a name="discordids">*</a>: To obtain the ID of a resource in discord, right-click on it in the interface and click "Copy ID". When supplying the ID for a *role* instead of a *user* for the `-tag` options, prepend an ampersand (`&`) at the start of the ID.</sup>
+| Name  | Feature | Default | Requires | Permissions |
+|-------|---------|---------|----------|-------------|
+| token | The whole thing - Omegga-Discord won't function without an auth token. | None
+| mod-channel-id | If present, users will be able to send in-game reports to this channel | None | None; `mod-tag-id`[*](#discordids) is optional and will allow the bot to tag mods in reports. | Ensure that your bot is permitted to send messages in the given channel.  If `mod-tag-id` is provided, ensure the bot is permitted to tag that role
+| enable-console-logs | Send console logs to `log-channel-id`? | false | `log-channel-id`[*](#discordids) | Ensure that your bot is permitted to send messages in `log-channel-id`
+| enable-godspeak-for-mods | Relay messages posted by users with role `mod-tag-id` to `chat-channel-id` to in-game chat, with special [mod] indicator? | true | `chat-channel-id`[*](#discordids), `mod-tag-id`[*](#discordids) | Ensure that your bot is permitted to read messages in `chat-channel-id`
+| enable-godspeak-for-users | Relay messages posted by any user to `chat-channel-id` to in-game chat? | false | `chat-channel-id`[*](#discordid) | Ensure that your bot is permitted to read messages in `chat-channel-id`
+| enable-chat-log | Send chat logs to `chat-channel-id`? | false | `chat-channel-id`[*](#discordids) | Ensure that your bot is permitted to send messages to `chat-channel-id`
+| enable-player-verification | Allow players to verify their Discord accounts? | true | `verify-timeout`; by default players are allotted 5 minutes to verify before needing to request another code.
+| enable-tracking-ingame-players | Designate in-game players in the given `guild-id` (AKA server) with the specified `ingame-role` ID? | false | `enable-player-verification`, `ingame-role`[*](#discordids), `guild-id`[*](#discordids) | Ensure that your bot is authorized to grant the given role. You will also need to give your bot the [*Server Members Gateway Intent*](#server-members-gateway-intent)
 
-## Usage
+<sup><a name="discordids">*</a>: To obtain the ID of a resource in discord, right-click on it in the interface and click "Copy ID".
 
-### Reporting
+## Server Members Gateway Intent
 
-Players can report incidents in-game even when mods are absent using the `/report` command, followed by a report
-message. The report will be logged in `mod-channel-id` (or `chat-channel-id` if absent), and `mod-tag-id` will be
-tagged. If a chat log is being maintained on the server, the report will also contain a link to the relevant message in
-the chat log.
+The Server Members Gateway Intent enables the bot to iterate over all server members, which is required for the in-game
+role feature.  If you wish to use this feature, you will need to:
+- go to the [applications tab on the Discord Developer Portal](https://discord.com/developers/applications)
 
-## Planned features
+- click on the application you will use for this bot - the one you set up in the [Setup](#setup) portion
 
-The following features are planned for this project. Anyone should feel free to contribute and submit a pull request.
+  ![app](Screenshots/app.png)
 
----
+- click on the bot tab
 
-- [x] **Reporting** (MVP achieved!)
+  ![bot tab](Screenshots/bot-tab.png)
 
-MVP:
+- turn on the Server Members Gateway Intent option
 
-- [x] Allow players to issue in-game reports
-
-- [x] tag mods in reports
-
-- [x] post reports in chat log if no mod-channel-id present
-
-- [x] link to relevant chat log
-
-Beyond MVP:
-
-- [x] Use `/` command instead of `!` command
-
-- [x] Rename `mod` to `report` for clarity
-
----
-
-- [ ] **Chat mirroring** (MVP achieved!)
-
-MVP:
-
-- [x] Maintain chat log in `chat-channel-id`, if present
-
-- [x] If `godspeak` is enabled, relay discord messages (mod and user)
-
-Beyond MVP:
-
-- [ ] Show server events in discord (i.e. catch LogChat events from console)
-
-- [ ] Allow Discord users to verify their in-game characters
-
-- [ ] Allow players to opt in or out of seeing Discord messages in-game, with default provided in config.
-
-- [ ] Show in-game players as separate role
-
-- [ ] Allow mentioning discord users from in-game chat
-
----
-
-- [ ] **Remote moderation**
-
-MVP:
-
-- [x] Mirror console logs in `log-channel-id`
-
-- [x] Allow users with access to `log-channel-id` to execute server commands from discord.
-
-- [ ] build in basic command macros
-    - [ ] ban
-    - [ ] kick
-
-BEYOND MVP:
-
-- [ ] build in advanced command macros
-    - [ ] clearBricks
-    - [ ] clearAllBricks
-    - [ ] loadBricks
-
-- [ ] Role integration; allow modifying in-game roles from Discord, and vice-versa
-
-- [ ] Build in safeguards to check issued commands against in-game roles
-
-- [ ] Allow issuing chat commands
-
-- [ ] Allow custom command macros
-
----
-
-- [ ] **Make Everything Configurable!!**
-
-- [ ] Configurable content of bot messages
-
-- [ ] Configurable embed colors
-
-*As more features are implemented, keep track of what can be made configurable here*
+  ![intent](Screenshots/intent.png)
