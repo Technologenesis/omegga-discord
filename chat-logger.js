@@ -10,8 +10,8 @@ function log_chats(omegga, discordClient, config) {
 
     discordClient.channels.fetch(config["chat-channel-id"]).then(chat_channel => {
         omegga.on("chat", (name, msg) => {
-            let embed = new Discord.MessageEmbed().setAuthor(name).setDescription(msg);
-            chat_channel.send(embed);
+            let discord_msg = create_discord_chat_message(name, msg, config["compact-chat"]);
+            chat_channel.send(discord_msg);
         });
 
         if(config["log-game-events"]) {
@@ -30,6 +30,13 @@ function log_chats(omegga, discordClient, config) {
             });
         }
     }).catch(reason => {throw "failed to get chat channel: " + reason.toString()});
+}
+
+function create_discord_chat_message(name, msg, compact) {
+    if(compact) {
+        return "**"+name+"**: "+msg;
+    }
+    return new Discord.MessageEmbed().setAuthor(name).setDescription(msg);
 }
 
 module.exports = log_chats;

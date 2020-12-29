@@ -59,7 +59,7 @@ function poll_online_players(omegga, role, player_verifier) {
         player_verifier.fetch_discord_id(player.name)
             .then(id => role.guild.members.fetch(id))
             .then(member => member.roles.add(role))
-            .catch();
+            .catch(() => {}); //this probably just means the player isn't verified
     }
 }
 
