@@ -77,7 +77,7 @@ options; each feature will require additional config options to be provided, or 
 
 **If you are having trouble starting the plugin, double check this guide and ensure that your config and permissions are
 set up accordingly.  Also be sure that you are using Discord IDs[*](#discordids) for your parameters, and double check
-that they're correct.
+that they're correct.**
 
 **Feature enablements**
 
@@ -89,7 +89,7 @@ that they're correct.
 | enable-godspeak-for-mods | Relay messages posted by users with role `mod-tag-id` to `chat-channel-id` to in-game chat, with special [mod] indicator? | true | `chat-channel-id`[*](#discordids), `mod-tag-id`[*](#discordids) | Ensure that your bot is permitted to read messages in `chat-channel-id`
 | enable-godspeak-for-users | Relay messages posted by any user to `chat-channel-id` to in-game chat? | false | `chat-channel-id`[*](#discordid) | Ensure that your bot is permitted to read messages in `chat-channel-id`
 | enable-chat-log | Send chat logs to `chat-channel-id`? | false | `chat-channel-id`[*](#discordids) | Ensure that your bot is permitted to send messages to `chat-channel-id`
-| enable-player-verification | Allow players to verify their Discord accounts? | true | `verify-timeout`; by default players are allotted 5 minutes to verify before needing to request another code.
+| enable-player-verification | Allow players to verify their Discord accounts? | true | `verify-timeout`; by default players are allotted 5 minutes to verify before needing to request another code. `verify-role-id` is an optional Discord role given to verified users.
 | enable-tracking-ingame-players | Designate in-game players in the given `guild-id` (AKA server) with the specified `ingame-role` ID? | false | `enable-player-verification`, `ingame-role`[*](#discordids), `guild-id`[*](#discordids) | Ensure that your bot is authorized to grant the given role. You will also need to give your bot the [*Server Members Gateway Intent*](#server-members-gateway-intent)
 
 <sup><a name="discordids">*</a>: To obtain the ID of a resource in discord, right-click on it in the interface and click "Copy ID".
