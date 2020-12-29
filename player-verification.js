@@ -137,9 +137,7 @@ class PlayerVerifier {
         let promise = Promise.resolve();
         if(config["verify-role-id"]) {
             promise = promise
-                .then( () => discordClient.guilds.fetch(config["guild-id"])
-                .then(guild => guild.members.fetch(msg.author))
-                .then(member => member.roles.add(config["verify-role-id"])));
+                .then( () => member.roles.add(config["verify-role-id"])));
         }
         if(config["change-nick-on-verify"]) {
             promise = promise
