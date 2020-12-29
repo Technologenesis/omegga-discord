@@ -27,7 +27,7 @@ function log_chats(omegga, discordClient, config) {
                     }
                     // also check it against the user defined screen
                     let whitelisted = msg.match(config["server-event-whitelist"]);
-                    let blacklisted = msg.match(config["server-event-blacklist"])
+                    let blacklisted = msg.match(config["server-event-blacklist"]);
                     if (whitelisted && !blacklisted) {
                         chat_channel.send(msg);
                     }
