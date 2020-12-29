@@ -61,6 +61,10 @@
       "description": "What role to use for marking in-game players",
       "type": "string"
     },
+    "verify-role-id": {
+      "description": "The role to assign users when they are verified",
+      "type": "string"
+    },
     "verify-timeout": {
       "description": "Allotted time to verify after receiving a code",
       "type": "number",
