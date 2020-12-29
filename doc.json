@@ -52,6 +52,11 @@
       "type": "boolean",
       "default": false
     },
+    "server-event-screen": {
+      "description": "Regex to screen game events before sending them to chat",
+      "type": "string",
+      "default": "^.* (?:joined|left) the game.$"
+    },
     "guild-id": {
       "description": "The ID of the Discord server",
       "type": "string"

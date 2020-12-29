@@ -25,7 +25,11 @@ function log_chats(omegga, discordClient, config) {
                         || msg.includes("[discord]"))) {
                         return;
                     }
-                    chat_channel.send(msg);
+                    // also check it against the user defined screen
+                    let screen_match = msg.match(config["server-event-screen"]);
+                    if (screen_match) {
+                        chat_channel.send(msg);
+                    }
                 }
             });
         }
