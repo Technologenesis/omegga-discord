@@ -24,11 +24,11 @@ function set_godspeak_listener(omegga, discordClient, chat_channel, config, mod_
         if (msg.channel === chat_channel && msg.author.id !== discordClient.user.id)
         {
             if(mod_role && mod_role.members.has(msg.member.id)) {
-                let msgPrefix = "<b><color=\"#ff0000\">" + msg.author.username +
+                let msgPrefix = "<b><color=\"#ff0000\">" + (msg.member.nickname || msg.author.username) +
                     " [mod]</color><color=\"#7289da\"> [discord]</color></b>";
                 omegga.broadcast(msgPrefix+"<color=\"ffffff\">: " + msg.content + "</color>");
             } else if(config["enable-godspeak-for-users"]) {
-                let msgPrefix = "<b><color=\"#ffff00\">" + msg.author.username +
+                let msgPrefix = "<b><color=\"#ffff00\">" + (msg.member.nickname || msg.author.username) +
                     "</color><color=\"#7289da\"> [discord]</color></b>";
                 omegga.broadcast(msgPrefix+"<color=\"ffffff\">: " + msg.content + "</color>");
             }
