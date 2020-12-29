@@ -52,10 +52,15 @@
       "type": "boolean",
       "default": false
     },
-    "server-event-screen": {
-      "description": "Regex to screen game events before sending them to chat",
+    "server-event-whitelist": {
+      "description": "Regex to match game events that should be relayed to chat",
       "type": "string",
       "default": "^.* (?:joined|left) the game.$"
+    },
+    "server-event-blacklist": {
+      "description": "Regex to match game events that should NOT be relayed to chat",
+      "type": "string",
+      "default": "^Auto-saved [\\d,]* bricks in [\\d]*.[\\d]*s."
     },
     "guild-id": {
       "description": "The ID of the Discord server",
