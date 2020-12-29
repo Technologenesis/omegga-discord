@@ -62,8 +62,15 @@ install the plugin dependencies:
 cd <Omegga-dir>/plugins
 git clone https://github.com/Technologenesis/omegga-discord.git
 cd omegga-discord
+git checkout tags/v1.0.0 #optional; the master branch should usually be stable,
+                          # but releases act as additional guarantees of stability.
+                          # However, the latest release may be missing experimental
+                          # features.
 npm i
 ```
+
+For a greater guarantee of stability, checkout the latest *release* before running `npm i`:
+
 
 ## Setup
 
