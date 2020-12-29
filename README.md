@@ -62,8 +62,15 @@ install the plugin dependencies:
 cd <Omegga-dir>/plugins
 git clone https://github.com/Technologenesis/omegga-discord.git
 cd omegga-discord
+git checkout tags/v1.0.0 #optional; the master branch should usually be stable,
+                          # but releases act as additional guarantees of stability.
+                          # However, the latest release may be missing experimental
+                          # features.
 npm i
 ```
+
+For a greater guarantee of stability, checkout the latest *release* before running `npm i`:
+
 
 ## Setup
 
@@ -95,6 +102,7 @@ that they're correct.**
 | enable-chat-log | Send chat logs to `chat-channel-id`? | false | `chat-channel-id`[*](#discordids).  Optionally, `log-game-events` can be used to log in-game events alongside chat messages. `compact-chat` enables a simpler, more compact format for chat logs. | Ensure that your bot is permitted to send messages to `chat-channel-id`
 | enable-player-verification | Allow players to verify their Discord accounts? | true | `verify-timeout`; by default players are allotted 5 minutes to verify before needing to request another code. `verify-role-id` is an optional Discord role given to verified users. `change-nick-on-verify` is optional and causes Discord nicknames to be set to the player's in-game name. | If applicable, ensure your bot has permission to grant the given role and/or change user nicknames.
 | enable-tracking-ingame-players | Designate in-game players in the given `guild-id` (AKA server) with the specified `ingame-role` ID? | false | `enable-player-verification`, `ingame-role`[*](#discordids), `guild-id`[*](#discordids) | Ensure that your bot is authorized to grant the given role. You will also need to give your bot the [*Server Members Gateway Intent*](#server-members-gateway-intent)
+| invite-url | If present, the !discord command will broadcast the invite url to the server | None
 
 <sup><a name="discordids">*</a>: To obtain the ID of a resource in discord, right-click on it in the interface and click "Copy ID".
 

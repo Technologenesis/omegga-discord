@@ -56,6 +56,10 @@
       "description": "The ID of the Discord server",
       "type": "string"
     },
+    "invite-url": {
+      "description": "The invite URL to broadcase when !discord is used",
+      "type": "string"
+    },
     "mod-channel-id": {
       "description": "The ID of the channel to post mod messages to",
       "type": "string"
@@ -101,6 +105,11 @@
       "name": "/whois",
       "description": "Get the verified discord user associated with a player",
       "example:": "/whois <player>"
+    },
+    {
+      "name": "!discord",
+      "description": "Broadcast the discord URL in chat",
+      "example": "!discord"
     }
   ]
 }
