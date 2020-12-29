@@ -22,14 +22,14 @@ function setup_tracking_ingame_players(omegga, discordClient, config, player_ver
                         player_verifier.fetch_discord_id(player.name)
                             .then(id => role.guild.members.fetch(id))
                             .then(member => member.roles.add(role))
-                            .catch();
+                            .catch(()=>{});
                     });
 
                     omegga.on("leave", player => {
                         player_verifier.fetch_discord_id(player.name)
                             .then(id => role.guild.members.fetch(id))
                             .then(member => member.roles.remove(role))
-                            .catch();
+                            .catch(()=>{});
                     });
 
                 })
