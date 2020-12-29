@@ -21,7 +21,7 @@ function log_chats(omegga, discordClient, config) {
                     let msg = logChat[1];
                     // make sure this isn't a player chat message, in-game or from discord
                     let chat_match = msg.match(/(.*): .*/);
-                    if (chat_match && (omegga.getPlayers().some(player => player.name === chat_match[1])
+                    if (chat_match && (omegga.getPlayers().some(player => chat_match[1].includes(player.name))
                         || msg.includes("[discord]"))) {
                         return;
                     }
