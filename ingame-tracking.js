@@ -13,6 +13,7 @@ function setup_tracking_ingame_players(omegga, discordClient, config, player_ver
             guild.roles.fetch(config["ingame-role"])
                 .then(role => {
 
+                    clear_online_players(role);
                     poll_online_players(omegga, role, player_verifier);
                     setInterval(() => {
                         poll_online_players(omegga, role, player_verifier);
@@ -42,22 +43,24 @@ function setup_tracking_ingame_players(omegga, discordClient, config, player_ver
         });
 }
 
-function poll_online_players(omegga, role, player_verifier) {// clear all role members
+function clear_online_players(role) {
     role.guild.members.fetch().then(members => {
         for (let member of members.array()) {
             member.roles.remove(role.id).catch(reason => {
                 throw "Failed to remove role: " + reason
             });
         }
-
-        // add currently in-game players to role
-        for (let player of omegga.getPlayers()) {
-            player_verifier.fetch_discord_id(player.name)
-                .then(id => role.guild.members.fetch(id))
-                .then(member => member.roles.add(role))
-                .catch();
-        }
     }).catch(reason => console.error("Failed to fetch members: " + reason));
+}
+
+function poll_online_players(omegga, role, player_verifier) {
+    // add currently in-game players to role
+    for (let player of omegga.getPlayers()) {
+        player_verifier.fetch_discord_id(player.name)
+            .then(id => role.guild.members.fetch(id))
+            .then(member => member.roles.add(role))
+            .catch();
+    }
 }
 
 module.exports = setup_tracking_ingame_players;
