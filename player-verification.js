@@ -139,7 +139,7 @@ class PlayerVerifier {
             promise = promise
                 .then( () => member.roles.add(config["verify-role-id"]));
         }
-        if(config["change-nick-on-verify"]) {
+        if(config["change-nick-on-verify"] && member.nickname !== playerName) {
             promise = promise
                 .then( () => member.setNickname(playerName));
         }
