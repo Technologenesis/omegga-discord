@@ -122,14 +122,13 @@ class PlayerVerifier {
     give_initial_verifications(omegga, discordClient, config) {
         this.pluginCtx.store.get("verified-players")
             .then(verified_players => {
-                let promises = [];
                 for(let key in verified_players.discord_to_brickadia) {
-                    promises.push(discordClient.guilds.fetch(config["guild-id"])
+                    discordClient.guilds.fetch(config["guild-id"])
                         .then(guild => guild.members.fetch(key))
                         .then(member => this.discord_side_verification(member,
-                            verified_players.discord_to_brickadia[key], config)));
+                            verified_players.discord_to_brickadia[key], config))
+                        .catch(reason => console.error(reason));
                 }
-                return Promise.all(promises);
             })
             .catch(reason => console.error("Failed to grant verified roles: " + reason));
     }
@@ -144,7 +143,7 @@ class PlayerVerifier {
         }
         if(config["change-nick-on-verify"]) {
             promise = promise
-                .then( () => member.setNickname(playerName))
+                .then( () => member.setNickname(playerName));
         }
         return promise;
     }
