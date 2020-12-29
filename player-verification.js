@@ -13,6 +13,14 @@ class PlayerVerifier {
             throw "The following configs are required for player verification, but were not found:\n" + missing_reqs.toString();
         }
 
+        if(config["verify-role-id"] && !config["guild-id"]) {
+            throw "Error: verify-role-id requires guild-id";
+        }
+
+        if(config["verify-role-id"]) {
+            this.give_initial_verifications(omegga, discordClient, config);
+        }
+
         omegga.on("cmd:verify", (name) => {
             let code = generate_code();
             while (this.codeMap[code]) {
@@ -61,10 +69,19 @@ class PlayerVerifier {
                     let name = this.codeMap[code];
                     if (name) {
                         msg.reply("Hi, " + name + "! Saving your verification status...");
-                        this.set(msg.author.id, name).then(() => {
-                            delete this.codeMap[code];
-                            msg.reply("Thanks! Your character '" + name + "' has been verified!");
-                        }).catch(reason => msg.reply("Error verifying character: " + reason));
+                        this.set(msg.author.id, name)
+                            .then(() => {
+                                if(config["verify-role-id"]) {
+                                    return discordClient.guilds.fetch(config["guild-id"])
+                                        .then(guild => guild.members.fetch(msg.author))
+                                        .then(member => member.roles.add(config["verify-role-id"]));
+                                }
+                            })
+                            .then(() => {
+                                delete this.codeMap[code];
+                                msg.reply("Thanks! Your character '" + name + "' has been verified!");
+                            })
+                            .catch(reason => msg.reply("Error verifying character: " + reason));
                     } else {
                         msg.reply("I couldn't find that verification code! Use /verify in-game to get a verification code.");
                     }
@@ -100,6 +117,20 @@ class PlayerVerifier {
             .then(
                 verified_players => best_guess(verified_players.brickadia_to_discord, brickadia_name)
             );
+    }
+
+    give_initial_verifications(omegga, discordClient, config) {
+        this.pluginCtx.store.get("verified-players")
+            .then(verified_players => {
+                let promises = [];
+                for(let key in verified_players.discord_to_brickadia) {
+                    promises.push(discordClient.guilds.fetch(config["guild-id"])
+                        .then(guild => guild.members.fetch(key))
+                        .then(member => member.roles.add(config["verify-role-id"])));
+                }
+                return Promise.all(promises);
+            })
+            .catch(reason => console.error("Failed to grant verified roles: " + reason));
     }
 }
 
