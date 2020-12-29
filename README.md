@@ -40,9 +40,13 @@ chat.
 In-game players can verify their Discord accounts with the `verify` command.  The `/whois` command can be used to show a
 player's Discord username.
 
+Optionally, a role can be assigned on verification and the user's nickname can be set to their in-game name.
+
 ![Verify command](Screenshots/verify_brickadia.png)
 
 ![Verifying with BrickadiaBot](Screenshots/verify_discord.png)
+
+![Verified role](Screenshots/verify_role.png)
 
 ### Tracking In-Game Players
 
