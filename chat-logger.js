@@ -10,7 +10,7 @@ function log_chats(omegga, discordClient, config) {
 
     discordClient.channels.fetch(config["chat-channel-id"]).then(chat_channel => {
         omegga.on("chat", (name, msg) => {
-            let discord_msg = create_discord_chat_msg(name, msg, config["compact-chat"]);
+            let discord_msg = create_discord_chat_message(name, msg, config["compact-chat"]);
             chat_channel.send(discord_msg);
         });
 
