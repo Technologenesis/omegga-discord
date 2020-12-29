@@ -24,6 +24,10 @@ class DiscordIntegrationPlugin {
 
         // todo: bind in-game users to discord users
 
+        if(this.config["invite-url"]) {
+            this.omegga.on("chatcmd:discord", () => this.omegga.broadcast(this.config["invite-url"]));
+        }
+
         // report log
         if(this.config["mod-channel-id"]) {
             log_reports(this.omegga, this.discordClient, this.config);

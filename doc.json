@@ -101,6 +101,11 @@
       "name": "/whois",
       "description": "Get the verified discord user associated with a player",
       "example:": "/whois <player>"
+    },
+    {
+      "name": "!discord",
+      "description": "Broadcast the discord URL in chat",
+      "example": "!discord"
     }
   ]
 }
