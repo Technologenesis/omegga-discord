@@ -14,14 +14,21 @@ function log_chats(omegga, discordClient, config) {
             chat_channel.send(embed);
         });
 
-        /*
-        omegga.on("line", logline => {
-            let logChat = logline.match(/\[\d+\.\d+\.\d+-\d+\.\d+\.\d+:\d+\]\[[\s\d]+\]LogChat: (.*)/);
-            if (logChat) {
-                chat_channel.send(logChat[1]);
-            }
-        });
-         */
+        if(config["log-game-events"]) {
+            omegga.on("line", logline => {
+                let logChat = logline.match(/\[\d+\.\d+\.\d+-\d+\.\d+\.\d+:\d+\]\[[\s\d]+\]LogChat: (.*)/);
+                if (logChat && logChat[1]) {
+                    let msg = logChat[1];
+                    // make sure this isn't a player chat message, in-game or from discord
+                    let chat_match = msg.match(/(.*): .*/);
+                    if (chat_match && (omegga.getPlayers().some(player => player.name === chat_match[1])
+                        || msg.includes("[discord]"))) {
+                        return;
+                    }
+                    chat_channel.send(msg);
+                }
+            });
+        }
     }).catch(reason => {throw "failed to get chat channel: " + reason.toString()});
 }
 

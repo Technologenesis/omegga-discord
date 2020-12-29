@@ -1,4 +1,5 @@
 const ConfigRequirements = require("./config-requirements");
+const Discord = require("discord.js");
 
 class PlayerVerifier {
     constructor(pluginCtx) {
@@ -122,14 +123,23 @@ class PlayerVerifier {
     give_initial_verifications(omegga, discordClient, config) {
         this.pluginCtx.store.get("verified-players")
             .then(verified_players => {
+                let promises = [];
                 for(let key in verified_players.discord_to_brickadia) {
-                    discordClient.guilds.fetch(config["guild-id"])
+                    let name = verified_players.discord_to_brickadia[key];
+                    promises.push(discordClient.guilds.fetch(config["guild-id"])
                         .then(guild => guild.members.fetch(key))
-                        .then(member => this.discord_side_verification(member,
-                            verified_players.discord_to_brickadia[key], config))
-                        .catch(reason => console.error(reason));
+                        .then(member => this.discord_side_verification(member, name, config))
+                        .catch(reason => {
+                            console.error("failed to grant role to player "+name+": "+reason);
+                            if(reason.code === 10007) { // this is the code for an unknown member
+                                delete verified_players.discord_to_brickadia[key];
+                                delete verified_players.brickadia_to_discord[name];
+                            }
+                        }));
                 }
+                return Promise.all(promises).then(() => verified_players);
             })
+            .then(verified_players => this.pluginCtx.store.set("verified-players", verified_players))
             .catch(reason => console.error("Failed to grant verified roles: " + reason));
     }
 
