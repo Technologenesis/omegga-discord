@@ -27,6 +27,11 @@
       "type": "boolean",
       "default": false
     },
+    "compact-chat": {
+      "description": "Send chat logs in plain, simple text instead of embeds",
+      "type": "boolean",
+      "default": false
+    },
     "enable-player-verification": {
       "description": "Allow players to verify their Discord accounts?",
       "type": "boolean",
