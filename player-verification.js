@@ -137,7 +137,7 @@ class PlayerVerifier {
         let promise = Promise.resolve();
         if(config["verify-role-id"]) {
             promise = promise
-                .then( () => member.roles.add(config["verify-role-id"])));
+                .then( () => member.roles.add(config["verify-role-id"]));
         }
         if(config["change-nick-on-verify"]) {
             promise = promise
