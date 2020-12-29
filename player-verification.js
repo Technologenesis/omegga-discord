@@ -74,7 +74,7 @@ class PlayerVerifier {
                                 if(config["verify-role-id"]) {
                                     return discordClient.guilds.fetch(config["guild-id"])
                                         .then(guild => guild.members.fetch(msg.author))
-                                        .then(member => member.roles.add(config["verify-role-id"]));
+                                        .then(member => this.discord_side_verification(member, name, config));
                                 }
                             })
                             .then(() => {
@@ -122,15 +122,28 @@ class PlayerVerifier {
     give_initial_verifications(omegga, discordClient, config) {
         this.pluginCtx.store.get("verified-players")
             .then(verified_players => {
-                let promises = [];
                 for(let key in verified_players.discord_to_brickadia) {
-                    promises.push(discordClient.guilds.fetch(config["guild-id"])
+                    discordClient.guilds.fetch(config["guild-id"])
                         .then(guild => guild.members.fetch(key))
-                        .then(member => member.roles.add(config["verify-role-id"])));
+                        .then(member => this.discord_side_verification(member,
+                            verified_players.discord_to_brickadia[key], config))
+                        .catch(reason => console.error(reason));
                 }
-                return Promise.all(promises);
             })
             .catch(reason => console.error("Failed to grant verified roles: " + reason));
+    }
+
+    discord_side_verification(member, playerName, config) {
+        let promise = Promise.resolve();
+        if(config["verify-role-id"]) {
+            promise = promise
+                .then( () => member.roles.add(config["verify-role-id"]));
+        }
+        if(config["change-nick-on-verify"] && member.nickname !== playerName && member.manageable) {
+            promise = promise
+                .then( () => member.setNickname(playerName));
+        }
+        return promise;
     }
 }
 

@@ -32,6 +32,11 @@
       "type": "boolean",
       "default": true
     },
+    "change-nick-on-verify": {
+      "description": "Change Discord nicknames to in-game names on verification?",
+      "type": "boolean",
+      "default": true
+    },
     "enable-tracking-ingame-players": {
       "description": "Use a role to show which verified players are online?",
       "type": "boolean",
