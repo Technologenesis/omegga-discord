@@ -42,6 +42,11 @@
       "type": "boolean",
       "default": false
     },
+    "log-game-events": {
+      "description": "Log game events along with chat?",
+      "type": "boolean",
+      "default": false
+    },
     "guild-id": {
       "description": "The ID of the Discord server",
       "type": "string"
