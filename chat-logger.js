@@ -10,6 +10,7 @@ function log_chats(omegga, discordClient, config) {
 
     discordClient.channels.fetch(config["chat-channel-id"]).then(chat_channel => {
         omegga.on("chat", (name, msg) => {
+            msg = sanitize(msg);
             let discord_msg = create_discord_chat_message(name, msg, config["compact-chat"]);
             chat_channel.send(discord_msg);
         });
@@ -35,6 +36,11 @@ function log_chats(omegga, discordClient, config) {
             });
         }
     }).catch(reason => {throw "failed to get chat channel: " + reason.toString()});
+}
+
+function sanitize(msg) {
+    // sanitize message for discord
+    return msg.replace(/@/g, "@\u200b");
 }
 
 function create_discord_chat_message(name, msg, compact) {
