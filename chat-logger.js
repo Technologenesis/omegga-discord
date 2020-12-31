@@ -1,6 +1,21 @@
 const Discord = require("discord.js");
 const ConfigRequirements = require("./config-requirements");
 
+const sanitize = str => str
+    // .replace(/&/g, '&')
+    .replace(/\\\\/g, '\\')
+    .replace(/;/g, '&scl;')
+    .replace(/>/g, '&gt;')
+    .replace(/_/g, '&und;')
+    .replace(/</g, '&lt;')
+    .replace(/"/g, '\\"')
+    .replace(/:\w+:/g, s => {
+        const emote = s.slice(1, -1);
+        if (EMOTES.includes(emote))
+            return `<emoji>${emote}</>`;
+        return s;
+    });
+
 function log_chats(omegga, discordClient, config) {
     // make sure all required config items are present
     let missing_reqs = ConfigRequirements.check_requirements(config, ["chat-channel-id"]);
@@ -10,7 +25,7 @@ function log_chats(omegga, discordClient, config) {
 
     discordClient.channels.fetch(config["chat-channel-id"]).then(chat_channel => {
         omegga.on("chat", (name, msg) => {
-            let discord_msg = create_discord_chat_message(name, msg, config["compact-chat"]);
+            let discord_msg = create_discord_chat_message(name, chat_channel, msg, config["compact-chat"]);
             chat_channel.send(discord_msg);
         });
 
@@ -21,7 +36,7 @@ function log_chats(omegga, discordClient, config) {
                     let msg = logChat[1];
                     // make sure this isn't a player chat message, in-game or from discord
                     let chat_match = msg.match(/(.*): .*/);
-                    if (chat_match && (omegga.getPlayers().some(player => chat_match[1].includes(player.name))
+                    if (chat_match && (omegga.getPlayers().some(player => chat_match[1].includes(sanitize(player.name)))
                         || msg.includes("[discord]"))) {
                         return;
                     }
@@ -37,11 +52,15 @@ function log_chats(omegga, discordClient, config) {
     }).catch(reason => {throw "failed to get chat channel: " + reason.toString()});
 }
 
-function create_discord_chat_message(name, msg, compact) {
+function create_discord_chat_message(name, channel, msg, compact) {
+    let content;
+    let embed;
     if(compact) {
-        return "**"+name+"**: "+msg;
+        content = "**"+name+"**: "+msg;
+    } else {
+        embed = new Discord.MessageEmbed().setAuthor(name).setDescription(msg);
     }
-    return new Discord.MessageEmbed().setAuthor(name).setDescription(msg);
+    return Discord.APIMessage.create(channel, content,{embed: embed, disableMentions: "all"});
 }
 
 module.exports = log_chats;
