@@ -45,7 +45,7 @@ function create_discord_chat_message(name, channel, msg, compact) {
     } else {
         embed = new Discord.MessageEmbed().setAuthor(name).setDescription(msg);
     }
-    return Discord.APIMessage.create(channel, content,{embed: embed, allowedMentions: {parse:["users"]}, disableMentions: "everyone"});
+    return Discord.APIMessage.create(channel, content,{embed: embed, disableMentions: "all"});
 }
 
 module.exports = log_chats;
