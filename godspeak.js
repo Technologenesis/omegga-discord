@@ -23,17 +23,27 @@ function set_godspeak_listener(omegga, discordClient, chat_channel, config, mod_
     discordClient.on("message", msg => {
         if (msg.channel === chat_channel && msg.author.id !== discordClient.user.id)
         {
-            if(mod_role && mod_role.members.has(msg.member.id)) {
-                let msgPrefix = "<b><color=\"#ff0000\">" + (msg.member.nickname || msg.author.username) +
-                    " [mod]</color><color=\"#7289da\"> [discord]</color></b>";
-                omegga.broadcast(msgPrefix+"<color=\"ffffff\">: " + msg.content + "</color>");
+            if(mod_role && mod_role.members && mod_role.members.has(msg.member.id)) {
+                send_godspeak(omegga, true, msg);
             } else if(config["enable-godspeak-for-users"]) {
-                let msgPrefix = "<b><color=\"#ffff00\">" + (msg.member.nickname || msg.author.username) +
-                    "</color><color=\"#7289da\"> [discord]</color></b>";
-                omegga.broadcast(msgPrefix+"<color=\"ffffff\">: " + msg.content + "</color>");
+                send_godspeak(omegga, false, msg);
             }
         }
     });
+}
+
+function send_godspeak(omegga, mod, msg) {
+    let msgPrefix = "<b><color=\"#ffff00\">" + (msg.member.nickname || msg.author.username) +
+        "</color><color=\"#7289da\"> [discord]</color></b>";
+    if(mod) {
+        msgPrefix = "<b><color=\"#ff0000\">" + (msg.member.nickname || msg.author.username) +
+            " [mod]</color><color=\"#7289da\"> [discord]</color></b>";
+    }
+    omegga.broadcast(msgPrefix+"<color=\"ffffff\">: " + sanitize(msg.content) + "</color>");
+}
+
+function sanitize(msg) {
+    let sanitized = msg.replace(/([<>])/g, "\\$&");
 }
 
 module.exports = setup_godspeak;
