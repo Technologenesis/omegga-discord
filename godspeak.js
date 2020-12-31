@@ -39,14 +39,15 @@ function send_godspeak(omegga, mod, msg) {
         msgPrefix = "<b><color=\"#ff0000\">" + (msg.member.nickname || msg.author.username) +
             " [mod]</color><color=\"#7289da\"> [discord]</color></b>";
     }
-    omegga.broadcast(msgPrefix+"<color=\"ffffff\">: " + parseLinks(sanitize(msg.content)) + "</color>");
+    omegga.broadcast(msgPrefix+": " + parseLinks(sanitize(msg.content)));
+    console.log(parseLinks(sanitize(msg.content)));
 }
 
 // These exist in OMEGGA_UTIL... but for some reason I can't access that from here
-// ugh. i hate doing this.
+// but hey i can justify duplicating this one because i'm sanitizing slightly differently
 const sanitize = str => str
     // .replace(/&/g, '&')
-    .replace(/\\/g, '\\\\')
+    .replace(/\\\\/g, '\\')
     .replace(/;/g, '&scl;')
     .replace(/>/g, '&gt;')
     .replace(/_/g, '&und;')
