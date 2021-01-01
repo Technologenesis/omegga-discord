@@ -8,13 +8,7 @@ const sanitize = str => str
     .replace(/>/g, '&gt;')
     .replace(/_/g, '&und;')
     .replace(/</g, '&lt;')
-    .replace(/"/g, '\\"')
-    .replace(/:\w+:/g, s => {
-        const emote = s.slice(1, -1);
-        if (EMOTES.includes(emote))
-            return `<emoji>${emote}</>`;
-        return s;
-    });
+    .replace(/"/g, '\\"');
 
 function log_chats(omegga, discordClient, config) {
     // make sure all required config items are present
