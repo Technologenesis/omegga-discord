@@ -33,10 +33,10 @@ function set_godspeak_listener(omegga, discordClient, chat_channel, config, mod_
 }
 
 function send_godspeak(omegga, mod, msg) {
-    let msgPrefix = "<b><color=\"#ffff00\">" + (msg.member.nickname || msg.author.username) +
+    let msgPrefix = "<b><color=\"#ffff00\">" + sanitize(msg.member.nickname || msg.author.username) +
         "</color><color=\"#7289da\"> [discord]</color></b>";
     if(mod) {
-        msgPrefix = "<b><color=\"#ff0000\">" + (msg.member.nickname || msg.author.username) +
+        msgPrefix = "<b><color=\"#ff0000\">" + sanitize(msg.member.nickname || msg.author.username) +
             " [mod]</color><color=\"#7289da\"> [discord]</color></b>";
     }
     omegga.broadcast(msgPrefix+": " + parseLinks(sanitize(msg.content)));
@@ -52,7 +52,10 @@ const sanitize = str => str
     .replace(/>/g, '&gt;')
     .replace(/_/g, '&und;')
     .replace(/</g, '&lt;')
-    .replace(/"/g, '\\"');
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\n\u200B')
+    .replace(/!/g, "!\u200B");
+
 const parseLinks = message => {
     const regex = /(\b(https?):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gim;
     return message.replace(regex, '<link="$1">$1</>');
