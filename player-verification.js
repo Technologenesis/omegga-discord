@@ -1,12 +1,34 @@
 const ConfigRequirements = require("./config-requirements");
 const Discord = require("discord.js");
 
+/*
+The PlayerVerifier class is responsible for processing verification requests
+and manipulating the underlying verification store, which is passed through the
+constructor.
+*/
 class PlayerVerifier {
-    constructor(pluginCtx) {
-        this.pluginCtx = pluginCtx;
-        this.codeMap = {};
-        this.setup_player_verification(pluginCtx.omegga, pluginCtx.discordClient, pluginCtx.config);
+    constructor(store, discordCodeManager = new VerificationCodeManager(), brickadiaCodeManager=new VerificationCodeManager()) {
+        this.#discordCodeManager = discordCodeManager;
+        this.#brickadiaCodeManager = brickadiaCodeManager;
+        this.#store = store;
     }
+
+    generate_code_for_discord_user(user) {
+        return this.#discordCodeManager.generate_code(user);
+    }
+
+    generate_code_for_brickadia_player(player) {
+        return this.#brickadiaCodeManager.generate_code(player);
+    }
+
+    verify_discord_user(code, player) {
+        this.#store.set(this.#discordCodeManager[code], player);
+    }
+
+    verify_brickadia_user(code, user) {
+        this.#store.set(user, this.#brickadiaCodeManager[code]);
+    }
+    
 
     setup_player_verification(omegga, discordClient, config) {
         let missing_reqs = ConfigRequirements.check_requirements(config, ["verify-timeout"]);
@@ -165,10 +187,6 @@ function best_guess(dict, searchTerm) {
         }
     }
     return results;
-}
-
-function generate_code() {
-    return getRandomInt(0, 10000).toString().padStart(4, "0");
 }
 
 function getRandomInt(min, max) {
