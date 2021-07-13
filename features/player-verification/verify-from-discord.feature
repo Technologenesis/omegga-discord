@@ -2,30 +2,27 @@ Feature: Verify from Discord
     Users should be able to verify from within Discord
 
     Background:
-        Given an Omegga instance
-        And a Discord instance
-        And Discord verification
-        And a Discord user
-
-    Scenario: A player tries to verify from Discord
+        Given a Player verifier
+        And a user ID
+        And a player ID
+    
+    Scenario: A user tries to verify from Discord
         When a user uses /verify in Discord
-        Then the user should receive a verification code in Discord PMs
+        Then the Player Verifier returns a verification code
+        And the verification code is mapped to the given user
 
     Scenario: A player sends a valid verification code in-game
         Given a valid verification code
         When a user sends the verification code in-game
-        Then the user is added to the verified list
-        And the user is shown a message that their verification succeeded
+        Then the user is mapped to the correct player
     
     Scenario: A player sends an invalid verification code in-game
         Given an invalid verification code
         When a user sends the verification code in-game
-        Then the user is not added to the verified list
-        And the user is shown a message that their code was invalid
+        Then the user is not mapped to any player
 
     Scenario: A player sends an expired verification code in-game
         Given a valid verification code
         When the verification code expires
         And the user sends the verification code in-game
-        Then the user is not added to the verified list
-        And the user is shown a message that their code was invalid
+        Then the user is not mapped to any player

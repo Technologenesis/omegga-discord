@@ -1,46 +1,65 @@
 const assert = require('assert');
 const { Given, When, Then } = require('@cucumber/cucumber');
 const PlayerVerifier = require('../../player-verification');
-const Discord = require("./mock-discord");
-const omegga = require("./mock-omegga");
 
-Given('an Omegga instance', function () {
-    // Create a mock Omegga instance
-    this.omegga = new MockOmegga();
+Given('a Player verifier', function () {
+    // Create a player verifier to object
+    this.player_verifier_store = {}
+    this.code_manager = {}
+    this.player_verifier = new PlayerVerifier(store=this.player_verifier_store, discord_code_manager=this.code_manager);
 });
 
-Given('a Discord instance', function () {
-    // Create a mock Discord instance
-    this.discord = new Discord.Client();
-})
-
-Given('Discord verification', function () {
-    // Set up Discord verification on the mock instances
-    this.player_verifier = new PlayerVerifier(this);
+Given('a user ID', function () {
+    // Create a mock user ID
+    this.user = "discorduser"
 });
 
-Given('a Discord user', function () {
-    // Create a mock user in the mock discord server
-    this.user = new Discord.User();
+Given('a player ID', function () {
+    // Create a mock player ID
+    this.player = "brickadiaplayer"
 });
 
 Given('a valid verification code', function () {
     // create a valid verification code
-    this.verification_code = this.player_verifier.generate_code();
-})
-
-When('A player uses /verify in Discord', function () {
-    // Cause the mock Discord instance to register a /verify message
-    this.discord.triggerEvent("message", new Discord.Message(this.discord, this.channel, this.user));
+    this.verification_code = "0000";
+    this.code_manager[this.verification_code] = this.player;
 });
 
-When('When a user sends the verification code in-game', function () {
-    // Cause the mock Omegga instance to register a verification code
-    this.omegga.triggerEvent("cmd:verify", ["fred", this.verification_code]);
+Given('an invalid verification code', function () {
+    // create an invalid verification code
+    this.verification_code = "0000";
+});
+
+When('a user uses \\/verify in Discord', function () {
+    // create a valid verification code
+    this.verification_code = this.player_verifier.generate_code_for_discord_user();
+});
+
+When('a user sends the verification code in-game', function () {
+    // attempt to verify the code
+    this.verification_result = this.player_verifier.verify_discord_user(this.verification_code, this.player);
+});
+
+When('the verification code expires', function () {
+    delete this.code_manager[this.verification_code];
 })
 
-Then('the user should receive a verification code in Discord PMs', function () {
-    // Check that the discord client has sent the user a message containing a 4-number code
-    assert.strictEqual(this.user.dmChannel.lastMessage.author, this.discord.user);
-    assert(this.user.dmChannel.lastMessage.content.match(/\d{4}/))
+Then('the Player Verifier returns a verification code', function () {
+    // ensure that a code was generated
+    assert(this.verification_code);
 });
+
+Then('the user is mapped to the correct player', function () {
+    // ensure that this.user is mapped to this.player in the store
+    assert.strictEqual(this.store[this.user], this.player);
+});
+
+Then('the user is not mapped to any player', function () {
+    // ensure that this.user is not mapped to any player in the store
+    assert(!this.store[this.user]);
+});
+
+Then('the verification code is mapped to the given user', function () {
+    // ensure that this.code_manager has mapped the verification code to the user
+    assert.strictEqual(this.user, this.code_manager[this.verification_code]);
+})
